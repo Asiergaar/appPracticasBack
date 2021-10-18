@@ -1,5 +1,7 @@
 'use strict'
 
+const Progress = require('../models/progress.model');
+const Capital = require('../models/capital.model');
 const Client = require('../models/client.model');
 
 // GET /clients
@@ -34,6 +36,17 @@ async function addClient (req, res) {
         email: req.body.email,
         entry_date: entry_date,
         start_capital: req.body.start_capital
+    });
+    // Add first progress and capital to database
+    const progress = await Progress.create({
+        progress_date: entry_date,
+        progress_percentage: 0
+    });
+    const capital = await Capital.create({
+        capital_client: client.client_id,
+        capital_date: entry_date,
+        capital_quantity: client.start_capital,
+        capital_progress: progress.progress_id
     });
     return res.status(200).send({
         message: 'success',
