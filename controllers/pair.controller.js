@@ -15,7 +15,9 @@ async function getPairs (req, res) {
 
 // GET /pairsName
 async function getPairsName (req, res) {
-    const sql = "SELECT p1.pair_id as id, t1.token_name as tokenA, t2.token_name as tokenB, e1.exchange_name as exchange FROM pairs p1 INNER JOIN tokens t1 ON t1.token_id = p1.tokenA LEFT JOIN tokens t2 ON t2.token_id = p1.tokenB INNER JOIN exchanges e1 ON e1.exchange_id = p1.pair_exchange";
+    // query without id's:
+    // const sql = "SELECT p1.pair_id as id, t1.token_name as tokenA, t2.token_name as tokenB, e1.exchange_name as exchange FROM pairs p1 INNER JOIN tokens t1 ON t1.token_id = p1.tokenA LEFT JOIN tokens t2 ON t2.token_id = p1.tokenB INNER JOIN exchanges e1 ON e1.exchange_id = p1.pair_exchange";
+    const sql = "SELECT p1.pair_id as id, t1.token_name as tokenA, p1.tokenA as tokenA_id, t2.token_name as tokenB, p1.tokenB as tokenB_id, e1.exchange_name as exchange, p1.pair_exchange as exchange_id FROM pairs p1 INNER JOIN tokens t1 ON t1.token_id = p1.tokenA LEFT JOIN tokens t2 ON t2.token_id = p1.tokenB INNER JOIN exchanges e1 ON e1.exchange_id = p1.pair_exchange;";
     const pairs = await sequelize.query(sql, { type: QueryTypes.SELECT});
     return res.status(200).send({
         message: 'success',
