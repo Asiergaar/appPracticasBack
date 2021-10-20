@@ -7,6 +7,8 @@ const poolController = require('../controllers/pool.controller');
 
 api.get("/getPools", poolController.getPools);
 api.get("/getPoolsName", poolController.getPoolsName);
+api.get("/getPoolsDistinct", poolController.getPoolsDistinct);
+api.get("/getPoolStatus", poolController.getPoolStatus);
 api.get("/getPool/:id", poolController.getPool);
 api.post("/addPool", poolController.addPool);
 api.post("/editPool/:id", poolController.editPool);

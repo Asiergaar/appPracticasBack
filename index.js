@@ -9,12 +9,11 @@ const Pair = require('./models/pair.model');
 const Progress = require('./models/progress.model');
 const Pool = require('./models/pool.model');
 
-// Cargamos app
+// App load
 const app = require('./app');
 
-//Server is started, port 3000
+//Server starts, port 3000
 app.listen(3000, async () => {
-  //console.log(sequelize);
     await sequelize.authenticate()
     .then(() => {
       console.log('Connection has been established successfully.');
@@ -38,6 +37,7 @@ app.listen(3000, async () => {
           // Pool.belongsTo(Pair);
       
 
+      // Sync tables
       Client.sync();
       Token.sync();
       Exchange.sync();

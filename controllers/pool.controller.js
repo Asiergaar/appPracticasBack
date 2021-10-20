@@ -23,6 +23,33 @@ async function getPoolsName (req, res) {
     });
 }
 
+// GET /poolsDistinct
+async function getPoolsDistinct (req, res) {
+    const sql = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name as exch FROM pairs pa3 INNER JOIN exchanges e1 ON e1.exchange_id = pa3.pair_exchange WHERE pa3.pair_id = p1.pool_pair) as exchange, (SELECT t1.token_name as tka FROM pairs pa1 INNER JOIN tokens t1  ON t1.token_id = pa1.tokenA WHERE pa1.pair_id = p1.pool_pair) as tokenA, (SELECT t2.token_name as tkb FROM pairs pa2 LEFT JOIN tokens t2 ON t2.token_id = pa2.tokenB WHERE pa2.pair_id = p1.pool_pair) as tokenB FROM pools p1 ORDER BY p1.pool_pair;";
+    const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    return res.status(200).send({
+        message: 'success',
+        data: pools
+    });
+}
+
+// GET /poolsStatus
+async function getPoolStatus (req, res) {
+    const sql = "SELECT p1.pool_date FROM Pools p1 WHERE date(p1.pool_date) = current_date;";
+    const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    if(pools == '' || pools == null || pools == undefined){
+        return res.status(200).send({
+            message: 'success',
+            data: 'empty'
+        });
+    } else {
+        return res.status(200).send({
+            message: 'success',
+            data: pools
+        });
+    }
+}
+
 // GET /pool/id
 async function getPool (req, res) {
     const id = req.params.id;
@@ -78,6 +105,8 @@ async function editPool (req, res) {
 module.exports = {
     getPools,
     getPoolsName,
+    getPoolsDistinct,
+    getPoolStatus,
     addPool,
     getPool,
     editPool
