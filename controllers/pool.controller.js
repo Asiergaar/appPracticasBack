@@ -109,26 +109,33 @@ async function getPoolsByDay (req, res) {
     const sqlpairs = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name as exch FROM pairs pa3 INNER JOIN exchanges e1 ON e1.exchange_id = pa3.pair_exchange WHERE pa3.pair_id = p1.pool_pair) as exchange, (SELECT t1.token_name as tka FROM pairs pa1 INNER JOIN tokens t1  ON t1.token_id = pa1.tokenA WHERE pa1.pair_id = p1.pool_pair) as tokenA, (SELECT t2.token_name as tkb FROM pairs pa2 LEFT JOIN tokens t2 ON t2.token_id = pa2.tokenB WHERE pa2.pair_id = p1.pool_pair) as tokenB FROM pools p1 ORDER BY p1.pool_pair;";
     const pairs = await sequelize.query(sqlpairs, { type: QueryTypes.SELECT});
 
-    // Create the query
-    let sql = "SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total";
-
-    // for loop
+    // Create the query with a for loop
+    let sql = "SELECT date(p1.pool_date) as Date, SUM(p1.invested_quantity) as TOTAL";
     for(let data in pairs){
         let pairId = pairs[data].pool_pair;
-        let alias = " as p" + pairId;
-
+        let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tokenA + " / " + pairs[data].tokenB + "'";
         sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND p2.pool_date = p1.pool_date)" + alias);
-
-        console.log(pairId);
-        console.log(alias);
     };
-
     sql = sql.concat(" FROM Pools p1 GROUP BY date;");
 
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
+
+    let increment = [];
+    for(let i = 0; i < pools.length; i++){
+        if (i == 0){ 
+            pools[i].Increment = 0;
+            pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100; 
+        }
+        else { 
+            pools[i].Increment = pools[i].TOTAL - pools[i-1].TOTAL;
+            pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100
+        }
+    }
+    console.log(pools);
     return res.status(200).send({
         message: 'success',
-        data: pools
+        data: pools,
+        increment: increment
     });
 }
 
