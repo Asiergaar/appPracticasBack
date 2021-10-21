@@ -12,5 +12,6 @@ api.get("/getPoolStatus", poolController.getPoolStatus);
 api.get("/getPool/:id", poolController.getPool);
 api.post("/addPool", poolController.addPool);
 api.post("/editPool/:id", poolController.editPool);
+api.get("/getPoolsByDay", poolController.getPoolsByDay);
 
 module.exports = api;
