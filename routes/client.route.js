@@ -9,5 +9,6 @@ api.get("/getClients", clientController.getClients);
 api.get("/getClient/:id", clientController.getClient);
 api.post("/addClient", clientController.addClient);
 api.post("/editClient/:id", clientController.editClient);
+api.get("/getClientsCapitals", clientController.getClientsCapitals);
 
 module.exports = api;

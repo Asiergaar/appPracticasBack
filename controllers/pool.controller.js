@@ -114,7 +114,7 @@ async function getPoolsByDay (req, res) {
     for(let data in pairs){
         let pairId = pairs[data].pool_pair;
         let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tokenA + " / " + pairs[data].tokenB + "'";
-        sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND p2.pool_date = p1.pool_date)" + alias);
+        sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND date(p2.pool_date) = date(p1.pool_date))" + alias);
     };
     sql = sql.concat(" FROM Pools p1 GROUP BY date;");
 
@@ -127,11 +127,10 @@ async function getPoolsByDay (req, res) {
             pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100; 
         }
         else { 
-            pools[i].Increment = pools[i].TOTAL - pools[i-1].TOTAL;
+            pools[i].Increment = (pools[i].TOTAL - pools[i-1].TOTAL);
             pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100
         }
     }
-    console.log(pools);
     return res.status(200).send({
         message: 'success',
         data: pools,

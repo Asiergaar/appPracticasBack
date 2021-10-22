@@ -40,11 +40,15 @@ const tokenRoutes = require('./routes/token.route');
 const exchangeRoutes = require('./routes/exchange.route');
 const pairRoutes = require('./routes/pair.route');
 const poolRoutes = require('./routes/pool.route');
+const progressRoutes = require('./routes/progress.route');
+const capitalRoutes = require('./routes/capital.route');
 
 app.use('/clients', clientRoutes);
 app.use('/tokens', tokenRoutes);
 app.use('/exchanges', exchangeRoutes);
 app.use('/pairs', pairRoutes);
 app.use('/pools', poolRoutes);
+app.use('/progress', progressRoutes);
+app.use('/capitals', capitalRoutes);
 
 module.exports = app;

@@ -3,6 +3,8 @@
 const Progress = require('../models/progress.model');
 const Capital = require('../models/capital.model');
 const Client = require('../models/client.model');
+const { QueryTypes } = require('sequelize');
+const sequelize = require('../database');
 
 // GET /clients
 async function getClients (req, res) {
@@ -29,7 +31,9 @@ async function getClient (req, res) {
 
 // POST /client/create
 async function addClient (req, res) {
-    var entry_date = Date();
+
+    // Create de client on DB
+    var entry_date = new Date();
     const client = await Client.create({
         client_name: req.body.client_name,
         client_surname: req.body.client_surname,
@@ -37,16 +41,32 @@ async function addClient (req, res) {
         entry_date: entry_date,
         start_capital: req.body.start_capital
     });
-    // Add first progress and capital to database
-    const progress = await Progress.create({
-        progress_date: entry_date,
-        progress_percentage: 0
-    });
+
+    // Create Progress if doesn't exist that day's progress
+    const sql = "SELECT date(p1.progress_date) as date FROM Progresses p1 WHERE date = '" + entry_date.toISOString().split('T')[0] + "';";
+    const pooldate = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    let id;
+
+    if (pooldate.length == 0){
+        // Add first progress and capital to database and get the progress id
+        id = await Progress.create({
+            progress_date: entry_date,
+            progress_percentage: 0
+        });
+        id = id.progress_id;
+    } else {
+        // Get the progress id
+        const sql = "SELECT p1.progress_id FROM Progresses p1 WHERE date(p1.progress_date) = '" + entry_date.toISOString().split('T')[0] + "';";
+        id = await sequelize.query(sql, { type: QueryTypes.SELECT});
+        id = id[0].progress_id;
+    }
+    
+    // Create the client's capital for that day
     const capital = await Capital.create({
         capital_client: client.client_id,
         capital_date: entry_date,
         capital_quantity: client.start_capital,
-        capital_progress: progress.progress_id
+        capital_progress: id
     });
     return res.status(200).send({
         message: 'success',
@@ -78,9 +98,20 @@ async function editClient (req, res) {
     });
 }
 
+// GET /getClientsCapitals
+async function getClientsCapitals (req, res) {
+    const sql = "SELECT c1.start_capital FROM Clients c1;";
+    const clients = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    return res.status(200).send({
+        message: 'success',
+        data: clients
+    });
+}
+
 module.exports = {
     getClients,
     addClient,
     getClient,
-    editClient
+    editClient,
+    getClientsCapitals
 }
