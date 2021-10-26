@@ -8,21 +8,29 @@ const sequelize = require('../database');
 
 // GET /clients
 async function getClients (req, res) {
-    const clients = await Client.findAll();
+    // get client + last capital and date
+    const sql = "SELECT cli.client_id, cli.client_name, cli.client_surname, cli.email, cli.entry_date, cli.start_capital, cap.capital_quantity as last_capital, max(cap.capital_date) as last_date FROM Clients cli INNER JOIN Capitals cap ON cli.client_id = cap.capital_client GROUP BY cli.client_id;";
+    const clients = await sequelize.query(sql, { type: QueryTypes.SELECT});
+
+    // get total benefit percentage
+    const sql2 = "SELECT ((pro.progress_percentage / 100 ) + 1) as progress FROM Progresses pro;";
+    const benefits = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+    let totalBenefit = 1;
+    for(let b in benefits){
+        totalBenefit = totalBenefit * benefits[b].progress;
+    }
     return res.status(200).send({
         message: 'success',
-        data: clients
+        data: clients,
+        benefit: totalBenefit
     });
 }
 
 // GET /client/id
 async function getClient (req, res) {
     const id = req.params.id;
-    const client = await Client.findAll({
-        where: {
-          client_id: id
-        }
-    });
+    const sql = "SELECT cli.client_id, cli.client_name, cli.client_surname, date(cli.entry_date) as entry_date, cli.email, cli.start_capital, cap.capital_quantity, date(cap.capital_date) as progress_date, pro.progress_percentage FROM Clients cli INNER JOIN Capitals cap ON cli.client_id = cap.capital_client INNER JOIN Progresses pro ON cap.capital_progress = pro.progress_id WHERE cli.client_id = " + id + ";";
+    const client = await sequelize.query(sql, { type: QueryTypes.SELECT});
     return res.status(200).send({
         message: 'success',
         data: client
