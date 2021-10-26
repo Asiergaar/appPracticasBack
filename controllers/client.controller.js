@@ -100,11 +100,19 @@ async function editClient (req, res) {
 
 // GET /getClientsCapitals
 async function getClientsCapitals (req, res) {
-    const sql = "SELECT c1.start_capital FROM Clients c1;";
-    const clients = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    const clientsList = await Client.findAll({attributes: ['client_id']});
+    let sql = "SELECT DISTINCT date(c1.capital_date) as Date, p1.progress_percentage as Benefit";
+        
+    for (let i = 0; i < clientsList.length; i++) {
+        let id = clientsList[i].dataValues.client_id;
+        sql = sql.concat(", (SELECT c2.capital_quantity FROM Capitals c2 WHERE c2.capital_date = c1.capital_date AND c2.capital_client = " + id + ") as 'Cliente " + id + "' ");
+    }
+
+    sql = sql.concat("FROM Capitals c1 INNER JOIN Progresses p1 ON p1.progress_id = c1.capital_progress;");
+    const capitals = await sequelize.query(sql, { type: QueryTypes.SELECT});
     return res.status(200).send({
         message: 'success',
-        data: clients
+        data: capitals
     });
 }
 
