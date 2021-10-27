@@ -1,6 +1,7 @@
 'use strict'
 
 const Pool = require('../models/pool.model');
+const Pair = require('../models/pair.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../database');
 
@@ -22,6 +23,23 @@ async function getPoolsName (req, res) {
     return res.status(200).send({
         message: 'success',
         data: pools
+    });
+}
+
+// GET /poolsData
+async function getPoolsData (req, res) {
+    const sql = "SELECT pair_id FROM Pairs;";
+    const pairs = await sequelize.query(sql, { type: QueryTypes.SELECT});
+    let result = [];
+    for(let i = 0; i < pairs.length; i++){
+        let id = pairs[i].pair_id;
+        const sql2 = "SELECT date(po.pool_date) as date, po.invested_quantity, po.pool_pair, tk1.token_name as tokenA, tk2.token_name tokenB, ex.exchange_name FROM Pools po INNER JOIN Pairs pa ON po.pool_pair = pa.pair_id INNER JOIN Tokens tk1 ON tk1.token_id = pa.tokenA LEFT JOIN Tokens tk2 ON tk2.token_id = pa.tokenB INNER JOIN Exchanges ex ON ex.exchange_id = pa.pair_exchange WHERE pool_pair = " + id + " ORDER BY date DESC;";
+        const poolData = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+        result.push(poolData);
+    }
+    return res.status(200).send({
+        message: 'success',
+        data: result
     });
 }
 
@@ -142,6 +160,7 @@ async function getPoolsByDay (req, res) {
 module.exports = {
     getPools,
     getPoolsName,
+    getPoolsData,
     getPoolsDistinct,
     getPoolStatus,
     addPool,
