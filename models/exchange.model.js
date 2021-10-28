@@ -16,6 +16,10 @@ const Exchanges = db.define('Exchanges', {
   URL: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  exchange_img_url: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
 }, {
   // Other model options go here

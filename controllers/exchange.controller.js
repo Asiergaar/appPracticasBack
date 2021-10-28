@@ -29,7 +29,8 @@ async function getExchange (req, res) {
 async function addExchange (req, res) {
     const exchange = await Exchange.create({
         exchange_name: req.body.exchange_name,
-        URL: req.body.url
+        URL: req.body.url,
+        exchange_img_url: req.body.exchange_img_url
     });
     return res.status(200).send({
         message: 'success',
@@ -42,7 +43,8 @@ async function editExchange (req, res) {
     const id = req.params.id;
     const exchange = await Exchange.update({ 
         exchange_name: req.body.exchange_name,
-        URL: req.body.url }, {
+        URL: req.body.url,
+        exchange_img_url: req.body.exchange_img_url }, {
         where: {
             exchange_id: id
         }

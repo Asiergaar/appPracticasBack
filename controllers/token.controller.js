@@ -30,7 +30,8 @@ async function getToken (req, res) {
 async function addToken (req, res) {
     const token = await Token.create({
         token_name: req.body.token_name,
-        ticker: req.body.ticker
+        ticker: req.body.ticker,
+        token_img_url: req.body.token_img_url
     });
     return res.status(200).send({
         message: 'success',
@@ -43,7 +44,8 @@ async function editToken (req, res) {
     const id = req.params.id;
     const token = await Token.update({ 
         token_name: req.body.token_name,
-        ticker: req.body.ticker }, {
+        ticker: req.body.ticker,
+        token_img_url: req.body.token_img_url }, {
         where: {
             token_id: id
         }
