@@ -91,7 +91,7 @@ async function addPool (req, res) {
     const sql = "SELECT progress_date FROM Progresses ORDER BY progress_date;";
     const progresses = await sequelize.query(sql, { type: QueryTypes.SELECT});
     
-    if(progresses.length == 0){
+    if (progresses.length == 0) {
         await Progress.create({
             progress_date: pool_date,
             progress_percentage: 0
