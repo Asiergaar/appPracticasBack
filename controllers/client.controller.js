@@ -113,7 +113,7 @@ async function getClientsCapitals (req, res) {
         
     for (let i = 0; i < clientsList.length; i++) {
         let id = clientsList[i].dataValues.client_id;
-        sql = sql.concat(", (SELECT c2.capital_quantity FROM Capitals c2 WHERE date(c2.capital_date) = date(c1.capital_date) AND c2.capital_client = " + id + ") as 'Cliente " + id + "' ");
+        sql = sql.concat(", (SELECT c2.capital_quantity FROM Capitals c2 WHERE date(c2.capital_date) = date(c1.capital_date) AND c2.capital_client = " + id + ") as 'Cliente " + id + "', (SELECT nc.newcapital_quantity FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(c1.capital_date) AND nc.newcapital_client = " + id + ") as 'newcapital" + id + "'"); 
     }
 
     sql = sql.concat("FROM Capitals c1 INNER JOIN Progresses p1 ON p1.progress_id = c1.capital_progress;");

@@ -5,6 +5,7 @@ const Client = require('./models/client.model');
 const Token = require('./models/token.model');
 const Exchange = require('./models/exchange.model');
 const Capital = require('./models/capital.model');
+const NewCapital = require('./models/newcapital.model');
 const Pair = require('./models/pair.model');
 const Progress = require('./models/progress.model');
 const Pool = require('./models/pool.model');
@@ -19,8 +20,10 @@ app.listen(3000, async () => {
       console.log('Connection has been established successfully.');
 
       // Capital model associations
-        Client.hasMany(Capital, { foreignKey: 'capital_client' });
-          // Capital.belongsTo(Client);
+      Client.hasMany(Capital, { foreignKey: 'capital_client' });
+        // Capital.belongsTo(Client);
+      Client.hasMany(NewCapital, { foreignKey: 'newcapital_client' });
+        // NewCapital.belongsTo(Client);
         Progress.hasMany(Capital, { foreignKey: 'capital_progress' });
           // Capital.belongsTo(Progress);
 
@@ -42,6 +45,7 @@ app.listen(3000, async () => {
       Token.sync();
       Exchange.sync();
       Capital.sync();
+      NewCapital.sync();
       Pair.sync();
       Progress.sync();
       Pool.sync();

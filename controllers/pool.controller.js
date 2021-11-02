@@ -141,6 +141,7 @@ async function addPool (req, res) {
         invested_quantity: req.body.invested_quantity,
         pool_pair: req.body.pool_pair
     });
+    
     return res.status(200).send({
         message: 'success',
         data: pool
@@ -183,7 +184,7 @@ async function getPoolsByDay (req, res) {
         let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tokenA + " / " + pairs[data].tokenB + "'";
         sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND date(p2.pool_date) = date(p1.pool_date))" + alias);
     };
-    sql = sql.concat(" FROM Pools p1 GROUP BY date;");
+    sql = sql.concat(" , (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as 'New Capital' FROM Pools p1 GROUP BY date;");
 
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
 

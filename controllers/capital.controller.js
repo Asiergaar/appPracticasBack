@@ -1,6 +1,7 @@
 'use strict'
 
 const Capital = require('../models/capital.model');
+const NewCapital = require('../models/newcapital.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../database');
 
@@ -63,8 +64,25 @@ async function addCapitals (req, res) {
     });
 }
 
+// POST /capitals/add
+async function newCapital (req, res) {
+    const fecha = new Date();
+
+    const newcapital = await NewCapital.create({
+        newcapital_date: fecha,
+        newcapital_quantity: req.body.newcapital_quantity,
+        newcapital_client: req.body.newcapital_client,
+    });
+
+    return res.status(200).send({
+        message: 'success',
+        data: newcapital
+    });
+}
+
 module.exports = {
     getCapitals,
     addCapitals,
-    getCapital
+    getCapital,
+    newCapital
 }
