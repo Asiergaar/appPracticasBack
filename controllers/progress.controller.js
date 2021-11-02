@@ -61,21 +61,20 @@ async function checkProgress (req, res) {
         for (let i = 1; i <= diffDays; i++) {
             let progressIdList = [];
             // Create missing progress
-            let datenew = new Date();
-            datenew.setDate(date1.getDate() + i);
+        let datenew = new Date(date1);
+        datenew.setDate(date1.getDate() + i);
             let progressId = await Progress.create({
                 progress_date: datenew,
                 progress_percentage: 0
             });
-                progressIdList.push(progressId.progress_id);
-                console.log(progressId.progress_id);
+            progressIdList.push(progressId.progress_id);
             // Create missing pools of the progress
-            let dateminus = new Date();
+            let dateminus = new Date(datenew);
             dateminus.setDate(datenew.getDate() - 1);
             const sql2 = "SELECT p1.invested_quantity as invested, p1.pool_pair as pair FROM Pools p1 WHERE date(p1.pool_date) = '" + dateminus.toISOString().split('T')[0] + "';";
             const pools = await sequelize.query(sql2, { type: QueryTypes.SELECT});
             for (let p in pools) {
-                await Pool.create({
+                const poo = await Pool.create({
                     pool_date: datenew,
                     invested_quantity: pools[p].invested,
                     pool_pair: pools[p].pair
@@ -107,8 +106,42 @@ async function checkProgress (req, res) {
     });
 }
 
+// GET 
+async function minusDate (req, res) {
+    const pools = await Pool.findAll();
+    for (let p in pools) {
+        let date = new Date(pools[p].pool_date);
+        date.setDate(date.getDate() - 1)
+        pools[p].update({
+            pool_date: date
+        });
+    }
+    const progress = await Progress.findAll();
+    for (let p in progress) {
+        let date = new Date(progress[p].progress_date);
+        date.setDate(date.getDate() - 1)
+        progress[p].update({
+            progress_date: date
+        });
+    }
+    const capitals = await Capital.findAll();
+    for (let p in capitals) {
+        let date = new Date(capitals[p].capital_date);
+        date.setDate(date.getDate() - 1)
+        capitals[p].update({
+            capital_date: date
+        });
+    }
+
+
+    return res.status(200).send({
+        message: 'success'
+    });
+}
+
 
 module.exports = {
     addProgress,
-    checkProgress
+    checkProgress,
+    minusDate
 } 

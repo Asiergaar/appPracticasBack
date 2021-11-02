@@ -54,16 +54,26 @@ async function getPoolsDistinct (req, res) {
 
 // GET /poolsStatus
 async function getPoolStatus (req, res) {
-    const sql = "SELECT p1.pool_date FROM Pools p1 WHERE date(p1.pool_date) = current_date;";
+    const sql = "SELECT p1.pool_pair, p1.invested_quantity, p1.pool_date as num FROM Pools p1 WHERE date(p1.pool_date) = current_date;";
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
-    if(pools == '' || pools == null || pools == undefined){
+    const sql2 = "SELECT p1.pool_date as num FROM Pools p1 WHERE date(p1.pool_date) = (SELECT date(min(p2.pool_date)) FROM Pools p2);";
+    const total = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+
+    if(pools == 0 || pools == null || pools == undefined){
         return res.status(200).send({
             message: 'success',
             data: 'empty'
         });
+    } else if (pools.length != total.length) {
+        return res.status(200).send({
+            message: 'success',
+            status: 'half',
+            data: pools
+        });
     } else {
         return res.status(200).send({
             message: 'success',
+            status: 'done',
             data: pools
         });
     }
@@ -84,10 +94,26 @@ async function getPool (req, res) {
 }
 
 // POST /pool/create
+async function addPools (req, res) {
+    var pool_date = Date();
+
+    // Creates the pool with the invested quantity
+    const pool = await Pool.create({
+        pool_date: pool_date,
+        invested_quantity: req.body.invested_quantity,
+        pool_pair: req.body.pool_pair
+    });
+    return res.status(200).send({
+        message: 'success',
+        data: pool
+    });
+}
+
+// POST /pool/create
 async function addPool (req, res) {
     var pool_date = Date();
 
-    // If is the first pool, creates the first progress
+    // If first pool, creates first progress
     const sql = "SELECT progress_date FROM Progresses ORDER BY progress_date;";
     const progresses = await sequelize.query(sql, { type: QueryTypes.SELECT});
     
@@ -97,6 +123,19 @@ async function addPool (req, res) {
             progress_percentage: 0
         });
     }
+    
+    // if previous progress existing, adds pools of those days at 0 
+    else if (progresses.length > 0) {
+        for (let p in progresses) {
+            await Pool.create({
+                pool_date: progresses[p].progress_date,
+                invested_quantity: 0,
+                pool_pair: req.body.pool_pair
+            });
+        }
+    }
+
+    // Creates the pool with the invested quantity
     const pool = await Pool.create({
         pool_date: pool_date,
         invested_quantity: req.body.invested_quantity,
@@ -174,6 +213,7 @@ module.exports = {
     getPoolsDistinct,
     getPoolStatus,
     addPool,
+    addPools,
     getPool,
     editPool,
     getPoolsByDay
