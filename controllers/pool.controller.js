@@ -184,7 +184,7 @@ async function getPoolsByDay (req, res) {
         let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tokenA + " / " + pairs[data].tokenB + "'";
         sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND date(p2.pool_date) = date(p1.pool_date))" + alias);
     };
-    sql = sql.concat(" , (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as 'New Capital' FROM Pools p1 GROUP BY date;");
+    sql = sql.concat(" , (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as 'NewCapital' FROM Pools p1 GROUP BY date;");
 
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
 
@@ -192,11 +192,13 @@ async function getPoolsByDay (req, res) {
     for(let i = 0; i < pools.length; i++){
         if (i == 0){ 
             pools[i].Increment = 0;
+            pools[i].RealIncrement = 0;
             pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100; 
         }
         else { 
             pools[i].Increment = (pools[i].TOTAL - pools[i-1].TOTAL);
-            pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100
+            pools[i].RealIncrement = (pools[i].TOTAL - pools[i-1].TOTAL) - pools[i].NewCapital;
+            pools[i].Benefit = (pools[i].RealIncrement / pools[i].TOTAL)*100
         }
     }
     return res.status(200).send({
