@@ -3,6 +3,7 @@
 const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
 const Capital = require('../models/capital.model');
+const NewCapital = require('../models/newcapital.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../database');
 
@@ -130,6 +131,14 @@ async function minusDate (req, res) {
         date.setDate(date.getDate() - 1)
         capitals[p].update({
             capital_date: date
+        });
+    }
+    const newcapitals = await NewCapital.findAll();
+    for (let p in newcapitals) {
+        let date = new Date(newcapitals[p].newcapital_date);
+        date.setDate(date.getDate() - 1)
+        newcapitals[p].update({
+            newcapital_date: date
         });
     }
 

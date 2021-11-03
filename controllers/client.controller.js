@@ -9,7 +9,7 @@ const sequelize = require('../database');
 // GET /clients
 async function getClients (req, res) {
     // get client + last capital and date
-    const sql = "SELECT cli.client_id, cli.client_name, cli.client_surname, cli.email, cli.entry_date, cli.start_capital, cap.capital_quantity as last_capital, max(cap.capital_date) as last_date FROM Clients cli INNER JOIN Capitals cap ON cli.client_id = cap.capital_client GROUP BY cli.client_id;";
+    const sql = "SELECT cli.client_id, cli.client_name, cli.client_surname, cli.email, cli.entry_date, cli.start_capital, cap.capital_quantity as last_capital, max(cap.capital_date) as last_date, (SELECT sum(nw2.newcapital_quantity) FROM Newcapitals nw2 WHERE nw2.newcapital_client = cli.client_id) as nwcap FROM Clients cli LEFT JOIN Capitals cap ON cli.client_id = cap.capital_client GROUP BY cli.client_id;";
     const clients = await sequelize.query(sql, { type: QueryTypes.SELECT});
 
     // get total benefit percentage

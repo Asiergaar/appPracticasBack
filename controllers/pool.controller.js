@@ -121,13 +121,13 @@ async function addPool (req, res) {
         await Progress.create({
             progress_date: pool_date,
             progress_percentage: 0
-        });
+        }); 
     }
     
     // if previous progress existing, adds pools of those days at 0 
-    else if (progresses.length > 0) {
+    else if (progresses.length > 1) {
         for (let p in progresses) {
-            await Pool.create({
+            await Progress.create({
                 pool_date: progresses[p].progress_date,
                 invested_quantity: 0,
                 pool_pair: req.body.pool_pair
