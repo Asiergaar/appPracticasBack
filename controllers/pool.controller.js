@@ -152,7 +152,7 @@ async function addPool (req, res) {
                 }
             });
 
-            // update progress
+            // update progress 
                 const sql1 = "SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total FROM Pools p1 GROUP BY date ORDER BY date DESC;"
                 const result1 = await sequelize.query(sql1, { type: QueryTypes.SELECT});
             
