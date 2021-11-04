@@ -49,8 +49,8 @@ async function checkProgress (req, res) {
     const result1 = await sequelize.query(sql1, { type: QueryTypes.SELECT});
 
     // Get today's and previous date
-    const today = new Date().toISOString().split('T')[0];
-    const last = result1[0].date;
+    const today = new Date().toISOString().split('T')[0] + 'T13:30:42';
+    const last = result1[0].date + 'T13:30:42';
 
     // If not same day, creates missing pools progress and capitals
     if (today != last){
@@ -58,7 +58,6 @@ async function checkProgress (req, res) {
         const date2 = new Date(today);
         const diffTime = Math.abs(date2 - date1);
         const diffDays = Math.ceil((diffTime / (1000 * 60 * 60 * 24)) - 1);
-        
         for (let i = 1; i <= diffDays; i++) {
             let progressIdList = [];
             // Create missing progress

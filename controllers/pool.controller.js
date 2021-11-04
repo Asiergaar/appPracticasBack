@@ -2,6 +2,7 @@
 
 const Pool = require('../models/pool.model');
 const Progress = require('../models/progress.model');
+const Capital = require('../models/capital.model');
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../database');
 
@@ -95,14 +96,18 @@ async function getPool (req, res) {
 
 // POST /pool/create
 async function addPools (req, res) {
+    let pool;
     var pool_date = Date();
+    var pools = req.body;
+    for (let p in pools) {
+        // Creates the pool with the invested quantity
+        pool = await Pool.create({
+            pool_date: pool_date,
+            invested_quantity: pools[p],
+            pool_pair: parseInt(p)
+        });
+    }
 
-    // Creates the pool with the invested quantity
-    const pool = await Pool.create({
-        pool_date: pool_date,
-        invested_quantity: req.body.invested_quantity,
-        pool_pair: req.body.pool_pair
-    });
     return res.status(200).send({
         message: 'success',
         data: pool
@@ -111,37 +116,82 @@ async function addPools (req, res) {
 
 // POST /pool/create
 async function addPool (req, res) {
-    var pool_date = Date();
 
-    // If first pool, creates first progress
     const sql = "SELECT progress_date FROM Progresses ORDER BY progress_date;";
     const progresses = await sequelize.query(sql, { type: QueryTypes.SELECT});
+
+    const pool_date = new Date();
+    const last_date = new Date(progresses[progresses.length - 1].progress_date);
+    let pool;
     
+    // If first pool, creates first progress
     if (progresses.length == 0) {
         await Progress.create({
             progress_date: pool_date,
             progress_percentage: 0
         }); 
     }
-    
     // if previous progress existing, adds pools of those days at 0 
     else if (progresses.length > 1) {
         for (let p in progresses) {
-            await Progress.create({
+            console.log(progresses[p].progress_date);
+            pool = await Pool.create({
                 pool_date: progresses[p].progress_date,
-                invested_quantity: 0,
+                invested_quantity: 0.00,
+                pool_pair: req.body.pool_pair
+            });
+        }
+
+        // if today's pools done
+        if (pool_date.toISOString().split('T')[0] == last_date.toISOString().split('T')[0]) {
+            // Updates the last pool with the invested quantity
+            await Pool.update({
+                invested_quantity: req.body.invested_quantity }, {
+                where: {
+                    pool_id: pool.pool_id
+                }
+            });
+
+            // update progress
+                const sql1 = "SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total FROM Pools p1 GROUP BY date ORDER BY date DESC;"
+                const result1 = await sequelize.query(sql1, { type: QueryTypes.SELECT});
+            
+                // Get today's and previous total
+                const total1 = result1[0].total;
+                const total2 = result1[1].total;
+
+                if(total2 == null){ total2 = total1; }
+                const benefit = ( ( total1 - total2 ) / total1) * 100;
+                const oldbenefit = ( ( (total1 - req.body.invested_quantity) - total2 ) / total1) * 100;
+
+                const sql2 = "UPDATE Progresses SET progress_percentage = " + benefit + " WHERE date(progress_date) = date('" + pool_date.toISOString().split('T')[0] + "');";
+                const result2 = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+
+            // update capitals
+                const sql3 = "SELECT * FROM Capitals WHERE date(capital_date) = date('" + pool_date.toISOString().split('T')[0] + "');";
+                const capitals = await sequelize.query(sql3, { type: QueryTypes.SELECT});
+
+                for (let c in capitals) {
+                    let newquantity = capitals[c].capital_quantity * ( (oldbenefit / 100) -1 );
+                    newquantity = newquantity * -( (benefit / 100) +1 );
+                    await Capital.update({
+                        capital_quantity: newquantity}, {
+                        where: {
+                            capital_id: capitals[c].capital_id
+                        }
+                    });
+                }
+
+        } else {
+            // Creates the pool with the invested quantity
+            const pool = await Pool.create({
+                pool_date: pool_date,
+                invested_quantity: req.body.invested_quantity,
                 pool_pair: req.body.pool_pair
             });
         }
     }
 
-    // Creates the pool with the invested quantity
-    const pool = await Pool.create({
-        pool_date: pool_date,
-        invested_quantity: req.body.invested_quantity,
-        pool_pair: req.body.pool_pair
-    });
-    
     return res.status(200).send({
         message: 'success',
         data: pool
