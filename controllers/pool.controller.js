@@ -11,8 +11,7 @@ async function getPools (req, res) {
     const pools = await Pool.findAll();
     return res.status(200).send({
         message: 'success',
-        data: pools,
-        pro: progresses
+        data: pools
     });
 }
 

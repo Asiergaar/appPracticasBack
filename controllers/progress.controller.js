@@ -18,21 +18,44 @@ async function addProgress (req, res) {
     const total1 = result1[0].total;
     const total2 = result1[1].total;
 
-
     if(total2 == null){
         total2 = total1;
     }
-    const capitalNew = 0;
+    
     const increment = total1 - total2;
+
+    const sql2 = "SELECT sum(newcapital_quantity) as newcapital FROM Newcapitals WHERE date(newcapital_date) = date('" + date.toISOString().split('T')[0] + "');";
+    const result2 = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+
+    const capitalNew = result2[0].newcapital;
     const realIncrement = increment - capitalNew;
     const benefit = (realIncrement / total1) * 100;
 
-    // Create Progress on DB
-    const progress = await Progress.create({
-        progress_date: date,
-        progress_percentage: benefit
+    const sql3 = "SELECT progress_id FROM Progresses WHERE date(progress_date) = date('" + date.toISOString().split('T')[0] + "');";
+    const oldprogress = await sequelize.query(sql3, { type: QueryTypes.SELECT});
+    
+    let progress;
+    // Create or Update Progress on DB
+    if(oldprogress.length == 0) {
+        progress = await Progress.create({
+            progress_date: date,
+            progress_percentage: benefit
 
-    });
+        });
+    } else {
+        await Progress.update({
+            progress_date: date,
+            progress_percentage: benefit }, {
+            where:{
+                progress_id: oldprogress[0].progress_id
+            }
+        });
+        progress = await Progress.findOne({
+            where:{
+                progress_id: oldprogress[0].progress_id
+            }
+        })
+    }
 
     return res.status(200).send({
         message: 'success',
