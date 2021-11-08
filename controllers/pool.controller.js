@@ -54,9 +54,9 @@ async function getPoolsDistinct (req, res) {
 
 // GET /poolsStatus
 async function getPoolStatus (req, res) {
-    const sql = "SELECT p1.pool_pair, p1.invested_quantity, p1.pool_date as num FROM Pools p1 WHERE date(p1.pool_date) = current_date;";
+    const sql = "SELECT p1.pool_pair, p1.invested_quantity, p1.pool_date FROM Pools p1 WHERE date(p1.pool_date) = current_date;";
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
-    const sql2 = "SELECT p1.pool_date as num FROM Pools p1 WHERE date(p1.pool_date) = (SELECT date(min(p2.pool_date)) FROM Pools p2);";
+    const sql2 = "SELECT p1.pool_date FROM Pools p1 WHERE date(p1.pool_date) = (SELECT date(min(p2.pool_date)) FROM Pools p2);";
     const total = await sequelize.query(sql2, { type: QueryTypes.SELECT});
 
     if(pools == 0 || pools == null || pools == undefined){

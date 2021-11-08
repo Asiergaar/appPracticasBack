@@ -109,14 +109,14 @@ async function editClient (req, res) {
 // GET /getClientsCapitals
 async function getClientsCapitals (req, res) {
     const clientsList = await Client.findAll({attributes: ['client_id']});
-    let sql = "SELECT DISTINCT date(c1.capital_date) as Date, p1.progress_percentage as Benefit";
+    let sql = "SELECT DISTINCT date(c1.capital_date) as Date, p1.progress_percentage as Benefit, sum(c1.capital_quantity) as 'Total', ( ( sum(c1.capital_quantity) ) - ( SELECT sum(po.invested_quantity) FROM Pools po WHERE date(c1.capital_date) = date(po.pool_date) GROUP BY date(po.pool_date) ) ) as Divergencia";
         
     for (let i = 0; i < clientsList.length; i++) {
         let id = clientsList[i].dataValues.client_id;
         sql = sql.concat(", (SELECT c2.capital_quantity FROM Capitals c2 WHERE date(c2.capital_date) = date(c1.capital_date) AND c2.capital_client = " + id + ") as 'Cliente " + id + "', (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(c1.capital_date) AND nc.newcapital_client = " + id + ") as 'newcapital" + id + "'"); 
     }
 
-    sql = sql.concat("FROM Capitals c1 INNER JOIN Progresses p1 ON p1.progress_id = c1.capital_progress;");
+    sql = sql.concat("FROM Capitals c1 INNER JOIN Progresses p1 ON p1.progress_id = c1.capital_progress GROUP BY date(c1.capital_date);");
     const capitals = await sequelize.query(sql, { type: QueryTypes.SELECT});
     return res.status(200).send({
         message: 'success',
