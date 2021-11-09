@@ -44,7 +44,7 @@ async function getPoolsData (req, res) {
 
 // GET /poolsDistinct
 async function getPoolsDistinct (req, res) {
-    const sql = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name FROM pairs pa1 INNER JOIN exchanges e1 ON e1.exchange_id = pa1.pair_exchange WHERE pa1.pair_id = p1.pool_pair) as exchange, (SELECT e2.exchange_img_url FROM pairs pa2 INNER JOIN exchanges e2 ON e2.exchange_id = pa2.pair_exchange WHERE pa2.pair_id = p1.pool_pair) as exchange_img_url, (SELECT t1.token_name FROM pairs pa3 INNER JOIN tokens t1  ON t1.token_id = pa3.tokenA WHERE pa3.pair_id = p1.pool_pair) as tokenA, (SELECT t1.token_img_url FROM pairs pa4 INNER JOIN tokens t1  ON t1.token_id = pa4.tokenA WHERE pa4.pair_id = p1.pool_pair) as tokenA_img_url, (SELECT t3.token_name FROM pairs pa5 LEFT JOIN tokens t3 ON t3.token_id = pa5.tokenB WHERE pa5.pair_id = p1.pool_pair) as tokenB , (SELECT t3.token_img_url FROM pairs pa6 LEFT JOIN tokens t3 ON t3.token_id = pa6.tokenB WHERE pa6.pair_id = p1.pool_pair) as tokenB_img_url FROM pools p1 ORDER BY p1.pool_pair;";
+    const sql = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name FROM pairs pa1 INNER JOIN exchanges e1 ON e1.exchange_id = pa1.pair_exchange WHERE pa1.pair_id = p1.pool_pair) as exchange, (SELECT e2.exchange_img_url FROM pairs pa2 INNER JOIN exchanges e2 ON e2.exchange_id = pa2.pair_exchange WHERE pa2.pair_id = p1.pool_pair) as exchange_img_url, (SELECT t1.token_name FROM pairs pa3 INNER JOIN tokens t1  ON t1.token_id = pa3.tokenA WHERE pa3.pair_id = p1.pool_pair) as tokenA, (SELECT t1.ticker FROM pairs pa3 INNER JOIN tokens t1  ON t1.token_id = pa3.tokenA WHERE pa3.pair_id = p1.pool_pair) as tickerA, (SELECT t1.token_img_url FROM pairs pa4 INNER JOIN tokens t1  ON t1.token_id = pa4.tokenA WHERE pa4.pair_id = p1.pool_pair) as tokenA_img_url, (SELECT t3.token_name FROM pairs pa5 LEFT JOIN tokens t3 ON t3.token_id = pa5.tokenB WHERE pa5.pair_id = p1.pool_pair) as tokenB, (SELECT t3.ticker FROM pairs pa5 LEFT JOIN tokens t3 ON t3.token_id = pa5.tokenB WHERE pa5.pair_id = p1.pool_pair) as tickerB, (SELECT t3.token_img_url FROM pairs pa6 LEFT JOIN tokens t3 ON t3.token_id = pa6.tokenB WHERE pa6.pair_id = p1.pool_pair) as tokenB_img_url FROM pools p1 ORDER BY p1.pool_pair;";
     const pools = await sequelize.query(sql, { type: QueryTypes.SELECT});
     return res.status(200).send({
         message: 'success',
@@ -223,14 +223,14 @@ async function editPool (req, res) {
 
 // GET /poolsByDay
 async function getPoolsByDay (req, res) {
-    const sqlpairs = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name as exch FROM pairs pa3 INNER JOIN exchanges e1 ON e1.exchange_id = pa3.pair_exchange WHERE pa3.pair_id = p1.pool_pair) as exchange, (SELECT t1.token_name as tka FROM pairs pa1 INNER JOIN tokens t1  ON t1.token_id = pa1.tokenA WHERE pa1.pair_id = p1.pool_pair) as tokenA, (SELECT t2.token_name as tkb FROM pairs pa2 LEFT JOIN tokens t2 ON t2.token_id = pa2.tokenB WHERE pa2.pair_id = p1.pool_pair) as tokenB FROM pools p1 ORDER BY p1.pool_pair;";
+    const sqlpairs = "SELECT DISTINCT p1.pool_pair, (SELECT e1.exchange_name as exch FROM pairs pa3 INNER JOIN exchanges e1 ON e1.exchange_id = pa3.pair_exchange WHERE pa3.pair_id = p1.pool_pair) as exchange, (SELECT t1.token_name as tka FROM pairs pa1 INNER JOIN tokens t1  ON t1.token_id = pa1.tokenA WHERE pa1.pair_id = p1.pool_pair) as tokenA, (SELECT t1.ticker as tka FROM pairs pa1 INNER JOIN tokens t1  ON t1.token_id = pa1.tokenA WHERE pa1.pair_id = p1.pool_pair) as tickerA, (SELECT t2.token_name as tkb FROM pairs pa2 LEFT JOIN tokens t2 ON t2.token_id = pa2.tokenB WHERE pa2.pair_id = p1.pool_pair) as tokenB, (SELECT t2.ticker as tkb FROM pairs pa2 LEFT JOIN tokens t2 ON t2.token_id = pa2.tokenB WHERE pa2.pair_id = p1.pool_pair) as tickerB FROM pools p1 ORDER BY p1.pool_pair;";
     const pairs = await sequelize.query(sqlpairs, { type: QueryTypes.SELECT});
 
     // Create the query with a for loop
     let sql = "SELECT date(p1.pool_date) as Date, SUM(p1.invested_quantity) as TOTAL";
     for(let data in pairs){
         let pairId = pairs[data].pool_pair;
-        let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tokenA + " / " + pairs[data].tokenB + "'";
+        let alias = " as '" + pairs[data].exchange + ": " + pairs[data].tickerA + " / " + pairs[data].tickerB + "'";
         sql = sql.concat(", (SELECT p2.invested_quantity FROM Pools p2 WHERE p2.pool_pair = " + pairId + " AND date(p2.pool_date) = date(p1.pool_date))" + alias);
     };
     sql = sql.concat(" , (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as 'NewCapital' FROM Pools p1 GROUP BY date;");
