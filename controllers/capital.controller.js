@@ -124,10 +124,22 @@ async function newCapital (req, res) {
     });
 }
 
+// GET /capitals/setCapital
+async function getMonthTotals (req, res) {
+    const sql = "SELECT date(capital_date) as Date, sum(capital_quantity) as Total FROM Capitals WHERE strftime('%m', capital_date) != strftime('%m', capital_date, '+1 day') AND strftime('%Y', capital_date) = strftime('%Y', 'now') GROUP BY date(capital_date) ORDER BY date(capital_date) DESC;";
+    const totals = await sequelize.query(sql, { type: QueryTypes.SELECT});
+
+    return res.status(200).send({
+        message: 'succes',
+        data: totals
+    });
+}
+
 module.exports = {
     getCapitals,
     addCapitals,
     getCapital,
     setCapital,
-    newCapital
+    newCapital,
+    getMonthTotals
 }
