@@ -16,6 +16,7 @@ async function getCapitals (req, res) {
 
 // GET /capital/id
 async function getCapital (req, res) {
+    
     const id = req.params.id;
     const capital = await Capital.findAll({
         where: {
