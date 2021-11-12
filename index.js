@@ -1,6 +1,7 @@
 const sequelize = require('./database');
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
+
 const Client = require('./models/client.model');
 const Token = require('./models/token.model');
 const Exchange = require('./models/exchange.model');
