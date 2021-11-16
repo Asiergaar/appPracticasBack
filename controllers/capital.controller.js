@@ -25,11 +25,7 @@ async function getCapitals (req, res) {
 async function getCapital (req, res) {
     try {
         const id = req.params.id;
-        const capital = await Capital.findAll({
-            where: {
-              capital_id: id
-            }
-        });
+        const capital = await Capital.findAll({ where: { capital_id: id } });
         return res.status(200).send({
             message: 'success',
             data: capital
