@@ -3,7 +3,7 @@
 const DB = require('./db.controller');
 const Capital = require('../models/capital.model');
 
-// GET /capitals
+// GET capitals data
 async function getCapitals (req, res) {
     try {
         const capitals = await Capital.findAll();
@@ -19,7 +19,7 @@ async function getCapitals (req, res) {
     }
 }
 
-// GET /capital/id
+// GET individual capital data
 async function getCapital (req, res) {
     try {
         const id = req.params.id;
@@ -36,7 +36,7 @@ async function getCapital (req, res) {
     }
 }
 
-// POST /capitals/add
+// POST add all clients capitals to database
 async function addCapitals (req, res) {
     try {
         // get the progress date and date -1 day
@@ -73,7 +73,7 @@ async function addCapitals (req, res) {
     }
 }
 
-// POST /capitals/setCapital
+// POST modify capital
 async function setCapital (req, res) {
     try {
         await DB.query("UPDATE Capitals SET capital_quantity = " + req.body.capital_quantity + " WHERE capital_client = " + req.body.capital_client + ";");
@@ -85,7 +85,7 @@ async function setCapital (req, res) {
     }
 }
 
-// POST /capitals/add
+// POST add one capital to database
 async function newCapital (req, res) {
     try {
         // Get data and create new capital on database
@@ -128,7 +128,7 @@ async function newCapital (req, res) {
     }
 }
 
-// GET /capitals/setCapital
+// GET month capitals total
 async function getMonthTotals (req, res) {
     try {
         const totals = await DB.query("SELECT date(capital_date) as Date, sum(capital_quantity) as Total FROM Capitals WHERE strftime('%m', capital_date) != strftime('%m', capital_date, '+1 day') AND strftime('%Y', capital_date) = strftime('%Y', 'now') GROUP BY date(capital_date) ORDER BY date(capital_date) DESC;");

@@ -13,13 +13,20 @@ const Progress = require('../models/progress.model');
 const Capital = require('../models/capital.model');
 const NewCapital = require('../models/newcapital.model');
 
-// Raw query
+
+/*
+ * This controller manage the queries with the database
+ */
+
+
+// RAW QUERY
 async function query(query) {
     return await sequelize.query(query, { type: QueryTypes.SELECT});
 }
 
+
 /* 
- * Add to database
+ * CREATE
  */
 
 async function createCapital(client, date, quantity, progress) {
@@ -96,6 +103,129 @@ async function createToken(name, ticker, imgUrl) {
     return token;
 }
 
+/*
+ *  UPDATE
+ */
+
+async function updateCapitalQuantity(newquantity, id) {
+    const capital = await Capital.update({
+        capital_quantity: newquantity}, {
+        where: {
+            capital_id: id
+        }
+    });
+    return capital;
+}
+
+async function updateExchange(name, url, imgUrl, id) {
+    const exchange = await Exchange.update({ 
+        exchange_name: name,
+        URL: url,
+        exchange_img_url: imgUrl }, {
+        where: {
+            exchange_id: id
+        }
+    })
+    .then(async (result) => {
+        const exchange = await Exchange.findByPk(id);
+        return exchange;
+    })
+    .catch((err) => {
+        return res.status(500);
+    });
+}
+
+async function updateClient(name, surname, email, id) {
+    const client = await Client.update({ 
+        client_name: name,
+        client_surname: surname,
+        email: email }, {
+        where: {
+            client_id: id
+        }
+    })
+    .then(async (result) => {
+        const client = await Client.findByPk(id);
+        return client;
+    })
+    .catch((err) => {
+        return res.status(500);
+    });
+}
+
+async function updatePair(tokenA, tokenB, exchange, id) {
+    const pair = await Pair.update({ 
+        tokenA: tokenA,
+        tokenB: tokenB,
+        pair_exchange: exchange, }, {
+        where: {
+            pair_id: id
+        }
+    })
+    .then(async (result) => {
+        const pair = await Pair.findByPk(id);
+        return pair;
+    })
+    .catch((err) => {
+        return res.status(500);
+    });
+}
+
+async function updatePool(date, quantity, pair, id) {
+    const pool = await Pool.update({ 
+        pool_date: date,
+        invested_quantity: quantity,
+        pool_pair: pair }, {
+        where: {
+            pool_id: id
+        }
+    })
+    .then(async (result) => {
+        const pool = await Pool.findByPk(id);
+        return pool;
+    })
+    .catch((err) => {
+        return res.status(500);
+    });
+}
+
+async function updatePoolQuantity(quantity, id) {
+    await Pool.update({
+        invested_quantity: quantity }, {
+        where: {
+            pool_id: id
+        }
+    });
+}
+
+async function updateProgress(date, benefit, id) {
+    await Progress.update({
+        progress_date: date,
+        progress_percentage: benefit }, {
+        where:{
+            progress_id: id
+        }
+    });
+}
+
+async function updateToken(name, ticker, imgUrl, id) {
+    const token = await Token.update({ 
+        token_name: name,
+        ticker: ticker,
+        token_img_url: imgUrl }, {
+        where: {
+            token_id: id
+        }
+    })
+    .then(async (result) => {
+        const token = await Token.findByPk(id);
+        return token;
+    })
+    .catch((err) => {
+        return res.status(500);
+    });
+}
+
 module.exports = {
     query,
     createCapital,
@@ -105,5 +235,13 @@ module.exports = {
     createPair,
     createPool,
     createProgress,
-    createToken
+    createToken,
+    updateCapitalQuantity,
+    updateClient,
+    updateExchange,
+    updatePair,
+    updatePool,
+    updatePoolQuantity,
+    updateProgress,
+    updateToken
 }

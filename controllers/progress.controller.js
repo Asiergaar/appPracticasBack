@@ -5,8 +5,6 @@ const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
 const Capital = require('../models/capital.model');
 const NewCapital = require('../models/newcapital.model');
-const { QueryTypes } = require('sequelize');
-const sequelize = require('../database');
 
 
 // GET /pool/create
@@ -32,13 +30,7 @@ async function addProgress (req, res) {
         if(oldprogress.length == 0) {
             progress = await DB.createProgress(date, benefit);
         } else {
-            await Progress.update({
-                progress_date: date,
-                progress_percentage: benefit }, {
-                where:{
-                    progress_id: oldprogress[0].progress_id
-                }
-            });
+            await DB.updateProgress(date, benefit, oldprogress[0].progress_id);
             progress = await Progress.findOne({
                 where:{
                     progress_id: oldprogress[0].progress_id

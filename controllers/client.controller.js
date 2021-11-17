@@ -1,12 +1,13 @@
 'use strict'
 
 const DB = require('./db.controller');
+const Utils = require('./utils.controller');
 const Client = require('../models/client.model');
 const nodemailer = require('../node_modules/nodemailer');
 const converter = require('../node_modules/json-2-csv');
 
 
-// GET /clients
+// GET clients data and last capital
 async function getClients (req, res) {
     try {
         // get client + last capital and date
@@ -30,7 +31,7 @@ async function getClients (req, res) {
     }
 }
 
-// GET /client/id
+// GET individual client data with al progresses and capital modifications
 async function getClient (req, res) {
     try {
         const id = req.params.id;
@@ -47,7 +48,7 @@ async function getClient (req, res) {
     }
 }
 
-// POST /client/create
+// POST create client (with progress and capital)
 async function addClient (req, res) {
     try {
         // Create de client on DB
@@ -82,29 +83,14 @@ async function addClient (req, res) {
     }
 }
 
-// POST /client/edit/2
+// POST edit client data
 async function editClient (req, res) {
     try {
-        const id = req.params.id;
-        const client = await Client.update({ 
-            client_name: req.body.client_name,
-            client_surname: req.body.client_surname,
-            email: req.body.email }, {
-            where: {
-                client_id: id
-            }
+        const client = await DB.updateClient(req.body.client_name, req.body.client_surname, req.body.email, req.params.id);
+        return res.status(200).send({
+            message: 'success',
+            data: client
         })
-        .then(async (result) => {
-            const client = await Client.findByPk(id);
-            console.log(client);
-            return res.status(200).send({
-                message: 'success',
-                data: client
-            })
-        })
-        .catch((err) => {
-            return res.status(500);
-        });
     } catch (err) {
         return res.status(500).send({
             message: 'error',
@@ -113,9 +99,10 @@ async function editClient (req, res) {
     }
 }
 
-// GET /getClientsCapitals
+// GET Array of all clients capitals (and newcapitals) by day
 async function getClientsCapitals (req, res) {
     try {
+        // Create query with subquery for every client
         const clientsList = await Client.findAll({attributes: ['client_id']});
         let sql = "SELECT DISTINCT date(c1.capital_date) as Date, p1.progress_percentage as Benefit, sum(c1.capital_quantity) as 'Total', ( ( sum(c1.capital_quantity) ) - ( SELECT sum(po.invested_quantity) FROM Pools po WHERE date(c1.capital_date) = date(po.pool_date) GROUP BY date(po.pool_date) ) ) as Divergence";
         for (let i = 0; i < clientsList.length; i++) {
@@ -138,10 +125,11 @@ async function getClientsCapitals (req, res) {
     }
 }
 
-// GET /clientsMonthlyData
+// GET clients monthly data
 async function clientMonthlyData (req, res) {
     try{
         let result = [];
+        let resultcsv = [];
         const clients = await Client.findAll();
         for (let cli in clients){
             const id = clients[cli].client_id;
@@ -156,21 +144,20 @@ async function clientMonthlyData (req, res) {
             
             // Add complete result to array
             result.push({ id: id, capitals });
-/*
+
             // convert json to csv
             try {
-                converter.json2csv(capitals, (err, csv) => {
-                    if (err) { throw err; }
-                    console.log(csv);
-                });
+                let csv = await Utils.jsonToCsv(capitals);
+                resultcsv.push({id: id, data: csv});
             } catch (err) {
                 console.log(err);
             }
-*/
+
         }
         return res.status(200).send({
             message: 'success',
-            data: result
+            data: result,
+            csv: resultcsv
         });
 
     } catch (err) {
