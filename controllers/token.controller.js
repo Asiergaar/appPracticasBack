@@ -21,11 +21,7 @@ async function getTokens (req, res) {
 // GET /token/id
 async function getToken (req, res) {
     try {
-        const token = await Token.findAll({
-            where: {
-                token_id: req.params.id
-            }
-        });
+        const token = await Token.findAll({ where: { token_id: req.params.id } });
         return res.status(200).send({
             message: 'success',
             data: token
@@ -41,11 +37,7 @@ async function getToken (req, res) {
 // POST /token/create
 async function addToken (req, res) {
     try {
-        const token = await Token.create({
-            token_name: req.body.token_name,
-            ticker: req.body.ticker,
-            token_img_url: req.body.token_img_url
-        });
+        const token = await Token.create(req.body.token_name, req.body.ticker, req.body.token_img_url);
         return res.status(200).send({
             message: 'success',
             data: token

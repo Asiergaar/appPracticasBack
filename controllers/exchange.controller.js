@@ -21,9 +21,7 @@ async function getExchanges (req, res) {
 // GET /Exchange/id
 async function getExchange (req, res) {
     try {
-        const exchange = await Exchange.findAll({
-            where: { exchange_id: req.params.id }
-        });
+        const exchange = await Exchange.findAll({ where: { exchange_id: req.params.id } });
         return res.status(200).send({
             message: 'success',
             data: exchange
@@ -39,11 +37,7 @@ async function getExchange (req, res) {
 // POST /exchange/create
 async function addExchange (req, res) {
     try {
-        const exchange = await Exchange.create({
-            exchange_name: req.body.exchange_name,
-            URL: req.body.url,
-            exchange_img_url: req.body.exchange_img_url
-        });
+        const exchange = await DB.create(req.body.exchange_name, req.body.url, req.body.exchange_img_url);
         return res.status(200).send({
             message: 'success',
             data: exchange
