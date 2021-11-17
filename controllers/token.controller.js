@@ -1,6 +1,6 @@
 'use strict'
 
-const DB = require('./db.controller');
+const DB = require('../services/db.service');
 const Token = require('../models/token.model');
 
 // GET /token

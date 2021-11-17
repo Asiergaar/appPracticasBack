@@ -1,7 +1,7 @@
 'use strict'
 
-const DB = require('./db.controller');
-const Utils = require('./utils.controller');
+const DB = require('../services/db.service');
+const Utils = require('../services/utils.service');
 const Client = require('../models/client.model');
 const nodemailer = require('../node_modules/nodemailer');
 const converter = require('../node_modules/json-2-csv');

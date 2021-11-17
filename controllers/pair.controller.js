@@ -1,6 +1,6 @@
 'use strict'
 
-const DB = require('./db.controller');
+const DB = require('../services/db.service');
 const Pair = require('../models/pair.model');
 
 // GET all pairs data

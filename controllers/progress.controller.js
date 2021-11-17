@@ -1,6 +1,6 @@
 'use strict'
 
-const DB = require('./db.controller');
+const DB = require('../services/db.service');
 const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
 const Capital = require('../models/capital.model');

@@ -1,7 +1,7 @@
 'use strict'
 
-const nodemailer = require('../node_modules/nodemailer');
-const converter = require('../node_modules/json-2-csv');
+const nodemailer = require('nodemailer');
+const converter = require('json-2-csv');
 
 // convert json to csv
 async function jsonToCsv(jsonFile) {
