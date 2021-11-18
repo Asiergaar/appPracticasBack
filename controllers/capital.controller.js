@@ -53,7 +53,13 @@ async function addCapitals (req, res) {
         // crete new capital for all the clients except the new ones
         for(let n in capitalList) {
             if(!newclients.includes(capitalList[n].capital_client)) {
-                const capital_quantity = capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1);
+                let newcap = await DB.query("SELECT newcapital_quantity FROM Newcapitals WHERE newcapital_client = " + capitalList[n].capital_client + " AND date(newcapital_date) = date('" + fecha.toISOString().split('T')[0] + "');");
+                if(newcap[0]){
+                    newcap = newcap[0].newcapital_quantity;
+                } else {
+                    newcap = 0;
+                }
+                const capital_quantity = (capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1)) + newcap;
                 const capital = await DB.createCapital(capitalList[n].capital_client, fecha, capital_quantity, req.body.progress_id);
             }
         }
