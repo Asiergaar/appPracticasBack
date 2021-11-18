@@ -1,8 +1,9 @@
 'use strict'
 
+const DB = require('../services/db.service');
 const Exchange = require('../models/exchange.model');
 
-// GET /Exchanges
+// GET all exchanges data
 async function getExchanges (req, res) {
     try {
         const exchanges = await Exchange.findAll();
@@ -18,12 +19,10 @@ async function getExchanges (req, res) {
     }
 }
 
-// GET /Exchange/id
+// GET individual exchange data
 async function getExchange (req, res) {
     try {
-        const exchange = await Exchange.findAll({
-            where: { exchange_id: req.params.id }
-        });
+        const exchange = await Exchange.findAll({ where: { exchange_id: req.params.id } });
         return res.status(200).send({
             message: 'success',
             data: exchange
@@ -36,14 +35,10 @@ async function getExchange (req, res) {
     }
 }
 
-// POST /exchange/create
+// POST Create exchange on database
 async function addExchange (req, res) {
     try {
-        const exchange = await Exchange.create({
-            exchange_name: req.body.exchange_name,
-            URL: req.body.url,
-            exchange_img_url: req.body.exchange_img_url
-        });
+        const exchange = await DB.createExchange(req.body.exchange_name, req.body.url, req.body.exchange_img_url);
         return res.status(200).send({
             message: 'success',
             data: exchange
@@ -56,29 +51,14 @@ async function addExchange (req, res) {
     }
 }
 
-// POST /exchange/edit/2
+// POST modify exchange data
 async function editExchange (req, res) {
     try {
-        const id = req.params.id;
-        const exchange = await Exchange.update({ 
-            exchange_name: req.body.exchange_name,
-            URL: req.body.url,
-            exchange_img_url: req.body.exchange_img_url }, {
-            where: {
-                exchange_id: id
-            }
+        const exchange = await DB.updateExchange(req.body.exchange_name, req.body.url, req.body.exchange_img_url, req.params.id);
+        return res.status(200).send({
+            message: 'success',
+            data: exchange
         })
-        .then(async (result) => {
-            const exchange = await Exchange.findByPk(id);
-            console.log(exchange);
-            return res.status(200).send({
-                message: 'success',
-                data: exchange
-            })
-        })
-        .catch((err) => {
-            return res.status(500);
-        });
     } catch (err) {
         return res.status(500).send({
             message: 'error',

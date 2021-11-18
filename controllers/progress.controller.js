@@ -1,19 +1,18 @@
 'use strict'
 
+const DB = require('../services/db.service');
 const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
 const Capital = require('../models/capital.model');
 const NewCapital = require('../models/newcapital.model');
-const { QueryTypes } = require('sequelize');
-const sequelize = require('../database');
+
 
 // GET /pool/create
 async function addProgress (req, res) {
     try {
         // Get today's and previous total 
         const date = new Date();
-        const sql1 = "SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total FROM Pools p1 GROUP BY date ORDER BY date DESC;"
-        const result1 = await sequelize.query(sql1, { type: QueryTypes.SELECT});
+        const result1 = await DB.query("SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total FROM Pools p1 GROUP BY date ORDER BY date DESC;");
         const total1 = result1[0].total;
         const total2 = result1[1].total;
         if(total2 == null){
@@ -21,29 +20,17 @@ async function addProgress (req, res) {
         }
         // Calculate the parameters
         const increment = total1 - total2;
-        const sql2 = "SELECT sum(newcapital_quantity) as newcapital FROM Newcapitals WHERE date(newcapital_date) = date('" + date.toISOString().split('T')[0] + "');";
-        const result2 = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+        const result2 = await DB.query("SELECT sum(newcapital_quantity) as newcapital FROM Newcapitals WHERE date(newcapital_date) = date('" + date.toISOString().split('T')[0] + "');");
         const realIncrement = increment - result2[0].newcapital;
         const benefit = (realIncrement / total1) * 100;
-        const sql3 = "SELECT progress_id FROM Progresses WHERE date(progress_date) = date('" + date.toISOString().split('T')[0] + "');";
-        const oldprogress = await sequelize.query(sql3, { type: QueryTypes.SELECT});
+        const oldprogress = await DB.query("SELECT progress_id FROM Progresses WHERE date(progress_date) = date('" + date.toISOString().split('T')[0] + "');");
         
         // Create or Update Progress on DB
         let progress;
         if(oldprogress.length == 0) {
-            progress = await Progress.create({
-                progress_date: date,
-                progress_percentage: benefit
-    
-            });
+            progress = await DB.createProgress(date, benefit);
         } else {
-            await Progress.update({
-                progress_date: date,
-                progress_percentage: benefit }, {
-                where:{
-                    progress_id: oldprogress[0].progress_id
-                }
-            });
+            await DB.updateProgress(date, benefit, oldprogress[0].progress_id);
             progress = await Progress.findOne({
                 where:{
                     progress_id: oldprogress[0].progress_id
@@ -67,8 +54,7 @@ async function addProgress (req, res) {
 async function checkProgress (req, res) {
     try {          
     // Get the last update's date
-    const sql1 = "SELECT max(date(p1.pool_date)) as date FROM Pools p1;"
-    const result1 = await sequelize.query(sql1, { type: QueryTypes.SELECT});
+    const result1 = await DB.query("SELECT max(date(p1.pool_date)) as date FROM Pools p1;");
 
     // Get today's and previous date
     const today = new Date().toISOString().split('T')[0] + 'T13:30:42';
@@ -86,35 +72,21 @@ async function checkProgress (req, res) {
             // Create missing progress
             let datenew = new Date(date1);
             datenew.setDate(date1.getDate() + i);
-            let progressId = await Progress.create({
-                progress_date: datenew,
-                progress_percentage: 0
-            });
+            let progressId = await DB.createProgress(datenew, 0);
             progressIdList.push(progressId.progress_id);
 
             // Create missing pools of the progress
             let dateminus = new Date(datenew);
             dateminus.setDate(datenew.getDate() - 1);
-            const sql2 = "SELECT p1.invested_quantity as invested, p1.pool_pair as pair FROM Pools p1 WHERE date(p1.pool_date) = '" + dateminus.toISOString().split('T')[0] + "';";
-            const pools = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+            const pools = await DB.query("SELECT p1.invested_quantity as invested, p1.pool_pair as pair FROM Pools p1 WHERE date(p1.pool_date) = '" + dateminus.toISOString().split('T')[0] + "';");
             for (let p in pools) {
-                const poo = await Pool.create({
-                    pool_date: datenew,
-                    invested_quantity: pools[p].invested,
-                    pool_pair: pools[p].pair
-                });
+                const poo = await DB.createPool(datenew, pools[p].invested, pools[p].pair);
             }
             // Create missing capitals
-            const sql3 = "SELECT c1.capital_client, c1.capital_quantity, c1.capital_progress FROM Capitals c1 WHERE date(c1.capital_date) = '" + dateminus.toISOString().split('T')[0] + "';";
-            const capitals = await sequelize.query(sql3, { type: QueryTypes.SELECT});
+            const capitals = await DB.query("SELECT c1.capital_client, c1.capital_quantity, c1.capital_progress FROM Capitals c1 WHERE date(c1.capital_date) = '" + dateminus.toISOString().split('T')[0] + "';");
             for (let p in capitals) {
                 let cont = 0;
-                await Capital.create({
-                    capital_client: capitals[p].capital_client,
-                    capital_date: datenew,
-                    capital_quantity: capitals[p].capital_quantity,
-                    capital_progress: progressIdList[cont]
-                });
+                await DB.createCapital(capitals[p].capital_client, datenew, capitals[p].capital_quantity, progressIdList[cont]);
                 cont++;
             }
 

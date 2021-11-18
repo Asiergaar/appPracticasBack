@@ -1,11 +1,9 @@
 'use strict'
 
+const DB = require('../services/db.service');
 const Capital = require('../models/capital.model');
-const NewCapital = require('../models/newcapital.model');
-const { QueryTypes } = require('sequelize');
-const sequelize = require('../database');
 
-// GET /capitals
+// GET capitals data
 async function getCapitals (req, res) {
     try {
         const capitals = await Capital.findAll();
@@ -21,7 +19,7 @@ async function getCapitals (req, res) {
     }
 }
 
-// GET /capital/id
+// GET individual capital data
 async function getCapital (req, res) {
     try {
         const id = req.params.id;
@@ -38,7 +36,7 @@ async function getCapital (req, res) {
     }
 }
 
-// POST /capitals/add
+// POST add all clients capitals to database
 async function addCapitals (req, res) {
     try {
         // get the progress date and date -1 day
@@ -47,29 +45,27 @@ async function addCapitals (req, res) {
         dateminus.setDate(dateminus.getDate() - 1);
     
         // gets yesterday capitals
-        const sql = "SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = date('" + dateminus.toISOString().split('T')[0] + "');";
-        const capitalList = await sequelize.query(sql, { type: QueryTypes.SELECT});
+        const capitalList = await DB.query("SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = date('" + dateminus.toISOString().split('T')[0] + "');");
     
         // get new clients of the date
-        const sql1 = "SELECT client_id FROM Clients WHERE date(entry_date) = date('" + fecha.toISOString().split('T')[0] + "');";
-        const newclients = await sequelize.query(sql1, { type: QueryTypes.SELECT});
+        const newclients = await DB.query("SELECT client_id FROM Clients WHERE date(entry_date) = date('" + fecha.toISOString().split('T')[0] + "');");
         
         // crete new capital for all the clients except the new ones
         for(let n in capitalList) {
             if(!newclients.includes(capitalList[n].capital_client)) {
-                const capital_quantity = capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1);
-                const capital = await Capital.create({
-                    capital_client: capitalList[n].capital_client,
-                    capital_date: fecha,
-                    capital_quantity: capital_quantity,
-                    capital_progress: req.body.progress_id
-                });
+                let newcap = await DB.query("SELECT newcapital_quantity FROM Newcapitals WHERE newcapital_client = " + capitalList[n].capital_client + " AND date(newcapital_date) = date('" + fecha.toISOString().split('T')[0] + "');");
+                if(newcap[0]){
+                    newcap = newcap[0].newcapital_quantity;
+                } else {
+                    newcap = 0;
+                }
+                const capital_quantity = (capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1)) + newcap;
+                const capital = await DB.createCapital(capitalList[n].capital_client, fecha, capital_quantity, req.body.progress_id);
             }
         }
         
         // Return new capitals list
-        const sql2 = "SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = '" + fecha.toISOString().split('T')[0] + "';";
-        const capitalList2 = await sequelize.query(sql2, { type: QueryTypes.SELECT});
+        const capitalList2 = await DB.query("SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = '" + fecha.toISOString().split('T')[0] + "';");
     
         return res.status(200).send({
             message: 'success',
@@ -83,11 +79,10 @@ async function addCapitals (req, res) {
     }
 }
 
-// POST /capitals/setCapital
+// POST modify capital
 async function setCapital (req, res) {
     try {
-        const sql = "UPDATE Capitals SET capital_quantity = " + req.body.capital_quantity + " WHERE capital_client = " + req.body.capital_client + ";";
-        await sequelize.query(sql, { type: QueryTypes.SELECT});
+        await DB.query("UPDATE Capitals SET capital_quantity = " + req.body.capital_quantity + " WHERE capital_client = " + req.body.capital_client + ";");
     } catch (err) {
         return res.status(500).send({
             message: 'error',
@@ -96,7 +91,7 @@ async function setCapital (req, res) {
     }
 }
 
-// POST /capitals/add
+// POST add one capital to database
 async function newCapital (req, res) {
     try {
         // Get data and create new capital on database
@@ -104,36 +99,25 @@ async function newCapital (req, res) {
         const quantity = req.body.newcapital_quantity;
         const client = req.body.newcapital_client;
     
-        const newcapital = await NewCapital.create({
-            newcapital_date: fecha,
-            newcapital_quantity: quantity,
-            newcapital_client: client,
-        });
+        const newcapital = await DB.createNewCapital(fecha, quantity, client,);
     
         // Get data and update the progress of the date
-        const sql1 = "SELECT date(p1.pool_date) as Date, sum(p1.invested_quantity) as TOTAL, (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as newcapitals FROM Pools p1 WHERE date(p1.pool_date) = date('" + fecha.toISOString().split('T')[0] + "') OR date(p1.pool_date) = date('" + fecha.toISOString().split('T')[0] + "', '-1 day') GROUP BY date(p1.pool_date);";
-        const totals = await sequelize.query(sql1, { type: QueryTypes.SELECT});
+        const totals = await DB.query("SELECT date(p1.pool_date) as Date, sum(p1.invested_quantity) as TOTAL, (SELECT sum(nc.newcapital_quantity) FROM Newcapitals nc WHERE date(nc.newcapital_date) = date(p1.pool_date)) as newcapitals FROM Pools p1 WHERE date(p1.pool_date) = date('" + fecha.toISOString().split('T')[0] + "') OR date(p1.pool_date) = date('" + fecha.toISOString().split('T')[0] + "', '-1 day') GROUP BY date(p1.pool_date);");
     
         if (totals.length > 1) {
             const increment = totals[1].TOTAL - totals[0].TOTAL;
             const realincrement = increment - quantity;
             const benefit = (realincrement / totals[1].TOTAL)*100;
     
-            const sql2 = "UPDATE Progresses SET progress_percentage = " + benefit + " WHERE date(progress_date) = date('" + fecha.toISOString().split('T')[0] + "');";
-            await sequelize.query(sql2, { type: QueryTypes.SELECT});
+            await DB.query("UPDATE Progresses SET progress_percentage = " + benefit + " WHERE date(progress_date) = date('" + fecha.toISOString().split('T')[0] + "');");
     
             //  Get previous capitals and update actual capitals
-            const sql3 = "SELECT date(cap.capital_date) as Date, cap.capital_quantity, cap.capital_client FROM Capitals cap WHERE date(cap.capital_date) = date('" + fecha.toISOString().split('T')[0] + "', '-1 day');";
-            const capitals = await sequelize.query(sql3, { type: QueryTypes.SELECT});
+            const capitals = await DB.query("SELECT date(cap.capital_date) as Date, cap.capital_quantity, cap.capital_client FROM Capitals cap WHERE date(cap.capital_date) = date('" + fecha.toISOString().split('T')[0] + "', '-1 day');");
     
             for(let p in capitals){
                 let newcapital = capitals[p].capital_quantity * ( (benefit / 100) + 1);
-                console.log(newcapital);
-                if (capitals[p].capital_client == client) {
-                    newcapital = newcapital + quantity;
-                }
-                let sql4 = "UPDATE Capitals SET capital_quantity = " + newcapital + " WHERE date(capital_date) = date('" + fecha.toISOString().split('T')[0] + "') AND capital_client = " + capitals[p].capital_client + ";";
-                await sequelize.query(sql4, { type: QueryTypes.SELECT});
+                if (capitals[p].capital_client == client) { newcapital = newcapital + quantity; }
+                await DB.query("UPDATE Capitals SET capital_quantity = " + newcapital + " WHERE date(capital_date) = date('" + fecha.toISOString().split('T')[0] + "') AND capital_client = " + capitals[p].capital_client + ";");
             }
         }
     
@@ -150,12 +134,10 @@ async function newCapital (req, res) {
     }
 }
 
-// GET /capitals/setCapital
+// GET month capitals total
 async function getMonthTotals (req, res) {
     try {
-        const sql = "SELECT date(capital_date) as Date, sum(capital_quantity) as Total FROM Capitals WHERE strftime('%m', capital_date) != strftime('%m', capital_date, '+1 day') AND strftime('%Y', capital_date) = strftime('%Y', 'now') GROUP BY date(capital_date) ORDER BY date(capital_date) DESC;";
-        const totals = await sequelize.query(sql, { type: QueryTypes.SELECT});
-    
+        const totals = await DB.query("SELECT date(capital_date) as Date, sum(capital_quantity) as Total FROM Capitals WHERE strftime('%m', capital_date) != strftime('%m', capital_date, '+1 day') AND strftime('%Y', capital_date) = strftime('%Y', 'now') GROUP BY date(capital_date) ORDER BY date(capital_date) DESC;");
         return res.status(200).send({
             message: 'succes',
             data: totals
