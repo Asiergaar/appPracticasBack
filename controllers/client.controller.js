@@ -11,7 +11,7 @@ const converter = require('../node_modules/json-2-csv');
 async function getClients (req, res) {
     try {
         // get client + last capital and date
-        const clients = await DB.query("SELECT cli.client_id, cli.client_name, cli.client_surname, cli.email, cli.entry_date, cli.start_capital, cap.capital_quantity as last_capital, max(cap.capital_date) as last_date, (SELECT sum(nw2.newcapital_quantity) FROM Newcapitals nw2 WHERE nw2.newcapital_client = cli.client_id) as nwcap FROM Clients cli LEFT JOIN Capitals cap ON cli.client_id = cap.capital_client GROUP BY cli.client_id;");
+        const clients = await DB.query("SELECT cli.client_id, cli.client_name, cli.client_surname, cli.email, cli.entry_date, CASE WHEN date(cli.entry_date) <= (SELECT date(min(entry_date)) FROM Clients) THEN true ELSE false END isInitial, cli.start_capital, cap.capital_quantity as last_capital, max(cap.capital_date) as last_date, (SELECT sum(nw2.newcapital_quantity) FROM Newcapitals nw2 WHERE nw2.newcapital_client = cli.client_id) as nwcap FROM Clients cli LEFT JOIN Capitals cap ON cli.client_id = cap.capital_client GROUP BY cli.client_id;");
     
         // get total benefit percentage
         const benefits = await DB.query("SELECT ((pro.progress_percentage / 100 ) + 1) as progress FROM Progresses pro;");
