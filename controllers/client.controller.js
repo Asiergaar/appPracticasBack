@@ -104,6 +104,15 @@ async function getClientsCapitals (req, res) {
     try {
         // Create query with subquery for every client
         const clientsList = await Client.findAll({attributes: ['client_id']});
+
+        // If no clients on database, return empty array
+        if (clientsList.length == 0) {
+            return res.status(200).send({
+                message: 'no data',
+                data: []
+            });
+        }
+
         let sql = "SELECT DISTINCT date(c1.capital_date) as Date, p1.progress_percentage as Benefit, sum(c1.capital_quantity) as 'Total', ( ( sum(c1.capital_quantity) ) - ( SELECT sum(po.invested_quantity) FROM Pools po WHERE date(c1.capital_date) = date(po.pool_date) GROUP BY date(po.pool_date) ) ) as Divergence";
         for (let i = 0; i < clientsList.length; i++) {
             let id = clientsList[i].dataValues.client_id;
