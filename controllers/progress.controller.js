@@ -1,6 +1,7 @@
 'use strict'
 
 const DB = require('../services/db.service');
+const Client = require('../models/client.model');
 const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
 const Capital = require('../models/capital.model');
@@ -109,6 +110,14 @@ async function checkProgress (req, res) {
 // Function to data testing: substract 1 day from database dates (pools, progresses, capitals and newcapitals)
 async function minusDate (req, res) {
     try {
+        const clients = await Client.findAll();
+        for (let p in clients) {
+            let date = new Date(clients[p].entry_date);
+            date.setDate(date.getDate() - 1)
+            clients[p].update({
+                entry_date: date
+            });
+        }
         const pools = await Pool.findAll();
         for (let p in pools) {
             let date = new Date(pools[p].pool_date);
