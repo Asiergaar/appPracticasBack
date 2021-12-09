@@ -148,7 +148,7 @@ async function minusDate (req, res) {
             date.setDate(date.getDate() - 1)
             newcapitals[p].update({
                 newcapital_date: date
-            });
+            }); 
         }
         return res.status(200).send({
             message: 'success'
