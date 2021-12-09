@@ -14,6 +14,11 @@ npm run start-dev
 
 Para arrancar en otro puerto, hay que modificar en el archivo _index.js_ el valor de la constante port al número de puerto que se quiera.
 
+### Base de datos
+La base de datos se genera en el archivo **farming.db** en la carpeta _/data_.
+
+Para visualizarla recomiendo utilizar [SQLiteStudio](https://sqlitestudio.pl/).
+
 
 ## Front-end:
 
@@ -45,3 +50,13 @@ En la home, hay un botón **app info** con unas pequeñas instrucciones. Para qu
 
   * _Para hacer pruebas y poder meter más datos, se pueden echar todas las fechas un día para atrás en:_ http://localhost:3000/progress/minusDate
 
+
+## Herramientas utilizadas
+
+### Back-end
+* [Node.Js](https://nodejs.org/es/download/)
+* [Sequelize](https://sequelize.org/)
+* [SQLiteStudio](https://sqlitestudio.pl/)
+
+### Front-end
+* [Angular](https://angular.io/)
