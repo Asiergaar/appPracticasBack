@@ -14,7 +14,7 @@ async function getTokens (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message.message
         });
     }
 }
@@ -30,7 +30,7 @@ async function getToken (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -46,7 +46,7 @@ async function addToken (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -62,7 +62,7 @@ async function editToken (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }

@@ -14,7 +14,7 @@ async function getPools (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -30,7 +30,7 @@ async function getPoolsName (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -52,7 +52,7 @@ async function getPoolsData (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -68,7 +68,7 @@ async function getPoolsDistinct (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -95,7 +95,7 @@ async function getPoolStatus (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -111,7 +111,7 @@ async function getPool (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -133,7 +133,7 @@ async function addPools (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -193,7 +193,7 @@ async function addPool (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -209,7 +209,7 @@ async function editPool (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -251,7 +251,7 @@ async function getPoolsByDay (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }

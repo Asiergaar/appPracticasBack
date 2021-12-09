@@ -24,7 +24,7 @@ async function checkClient (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -42,7 +42,7 @@ async function checkExchange (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -65,7 +65,7 @@ async function checkToken (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -99,7 +99,7 @@ async function checkPair (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }

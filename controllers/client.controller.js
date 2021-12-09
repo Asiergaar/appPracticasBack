@@ -26,7 +26,7 @@ async function getClients (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -43,7 +43,7 @@ async function getClient (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -78,7 +78,7 @@ async function addClient (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -94,7 +94,7 @@ async function editClient (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -129,7 +129,7 @@ async function getClientsCapitals (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -172,7 +172,7 @@ async function getClientMonthlyData (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }

@@ -14,7 +14,7 @@ async function getCapitals (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -31,7 +31,7 @@ async function getCapital (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -54,12 +54,12 @@ async function addCapitals (req, res) {
         for(let n in capitalList) {
             if(!newclients.includes(capitalList[n].capital_client)) {
                 let newCap = await DB.query("SELECT newcapital_quantity FROM Newcapitals WHERE newcapital_client = " + capitalList[n].capital_client + " AND date(newcapital_date) = date('" + fecha.toISOString().split('T')[0] + "');");
-                if(newcap[0]){
-                    newCap = newcap[0].newcapital_quantity;
+                if(newCap[0]){
+                    newCap = newCap[0].newcapital_quantity;
                 } else {
                     newCap = 0;
                 }
-                const capital_quantity = (capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1)) + newcap;
+                const capital_quantity = (capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1)) + newCap;
                 const capital = await DB.createCapital(capitalList[n].capital_client, fecha, capital_quantity, req.body.progress_id);
             }
         }
@@ -74,7 +74,7 @@ async function addCapitals (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -86,7 +86,7 @@ async function setCapital (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -129,7 +129,7 @@ async function newCapital (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
@@ -145,7 +145,7 @@ async function getMonthTotals (req, res) {
     } catch (err) {
         return res.status(500).send({
             message: 'error',
-            data: err
+            data: err.message
         });
     }
 }
