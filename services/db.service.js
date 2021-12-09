@@ -30,77 +30,69 @@ async function query(query) {
  */
 
 async function createCapital(client, date, quantity, progress) {
-    const capital = await Capital.create({
+    return await Capital.create({
         capital_client: client,
         capital_date: date,
         capital_quantity: quantity,
         capital_progress: progress
     });
-    return capital;
 }
 
 async function createExchange(name, url, imgUrl) {
-    const exchange = await Exchange.create({
+    return await Exchange.create({
         exchange_name: name,
         URL: url,
         exchange_img_url: imgUrl
     });
-    return exchange;
 }
 
 async function createClient(name, surname, email, entry_date, start_capital) {
-    const client = await Client.create({
+    return await Client.create({
        client_name: name,
        client_surname: surname,
        email: email,
        entry_date: entry_date,
        start_capital: start_capital
    });
-   return client;
 }
 
 async function createNewCapital(date, quantity, client) {
-    const newcapital = await NewCapital.create({
+    return await NewCapital.create({
         newcapital_date: date,
         newcapital_quantity: quantity,
         newcapital_client: client,
     });
-    return newcapital;
 }
 
 async function createPair(tokenA, tokenB, exchange) {
-    const pair = await Pair.create({
+    return await Pair.create({
         tokenA: tokenA,
         tokenB: tokenB,
         pair_exchange: exchange,
     });
-    return pair
 }
 
 async function createPool(date, quantity, pair) {
-    const pool = await Pool.create({
+    return await Pool.create({
         pool_date: date,
         invested_quantity: quantity,
         pool_pair: pair
     });
-   return pool;
 }
 
 async function createProgress(date, percentage) {
-    const progress =  await Progress.create({
+    return await Progress.create({
         progress_date: date,
         progress_percentage: percentage
     });
-    return progress;
 }
 
 async function createToken(name, ticker, imgUrl) {
-    const token = await Token.create({
+    return await Token.create({
         token_name: name,
         ticker: ticker,
         token_img_url: imgUrl
     });
-    return token;
 }
 
 /*
@@ -108,17 +100,16 @@ async function createToken(name, ticker, imgUrl) {
  */
 
 async function updateCapitalQuantity(newquantity, id) {
-    const capital = await Capital.update({
+    return await Capital.update({
         capital_quantity: newquantity}, {
         where: {
             capital_id: id
         }
     });
-    return capital;
 }
 
 async function updateExchange(name, url, imgUrl, id) {
-    const exchange = await Exchange.update({ 
+    await Exchange.update({ 
         exchange_name: name,
         URL: url,
         exchange_img_url: imgUrl }, {
@@ -127,16 +118,15 @@ async function updateExchange(name, url, imgUrl, id) {
         }
     })
     .then(async (result) => {
-        const exchange = await Exchange.findByPk(id);
-        return exchange;
+        return await Exchange.findByPk(id);
     })
     .catch((err) => {
-        return res.status(500);
+        return err.status(500);
     });
 }
 
 async function updateClient(name, surname, email, id) {
-    const client = await Client.update({ 
+    await Client.update({ 
         client_name: name,
         client_surname: surname,
         email: email }, {
@@ -145,16 +135,15 @@ async function updateClient(name, surname, email, id) {
         }
     })
     .then(async (result) => {
-        const client = await Client.findByPk(id);
-        return client;
+        return await Client.findByPk(id);
     })
     .catch((err) => {
-        return res.status(500);
+        return err.status(500);
     });
 }
 
 async function updatePair(tokenA, tokenB, exchange, id) {
-    const pair = await Pair.update({ 
+    await Pair.update({ 
         tokenA: tokenA,
         tokenB: tokenB,
         pair_exchange: exchange, }, {
@@ -163,16 +152,15 @@ async function updatePair(tokenA, tokenB, exchange, id) {
         }
     })
     .then(async (result) => {
-        const pair = await Pair.findByPk(id);
-        return pair;
+        return await Pair.findByPk(id);
     })
     .catch((err) => {
-        return res.status(500);
+        return err.status(500);
     });
 }
 
 async function updatePool(date, quantity, pair, id) {
-    const pool = await Pool.update({ 
+    await Pool.update({ 
         pool_date: date,
         invested_quantity: quantity,
         pool_pair: pair }, {
@@ -181,11 +169,10 @@ async function updatePool(date, quantity, pair, id) {
         }
     })
     .then(async (result) => {
-        const pool = await Pool.findByPk(id);
-        return pool;
+        return await Pool.findByPk(id);
     })
     .catch((err) => {
-        return res.status(500);
+        return err.status(500);
     });
 }
 
@@ -209,7 +196,7 @@ async function updateProgress(date, benefit, id) {
 }
 
 async function updateToken(name, ticker, imgUrl, id) {
-    const token = await Token.update({ 
+    await Token.update({ 
         token_name: name,
         ticker: ticker,
         token_img_url: imgUrl }, {
@@ -218,11 +205,10 @@ async function updateToken(name, ticker, imgUrl, id) {
         }
     })
     .then(async (result) => {
-        const token = await Token.findByPk(id);
-        return token;
+        return await Token.findByPk(id);
     })
     .catch((err) => {
-        return res.status(500);
+        return err.status(500);
     });
 }
 

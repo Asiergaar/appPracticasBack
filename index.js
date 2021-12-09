@@ -14,46 +14,47 @@ const Pool = require('./models/pool.model');
 // App load
 const app = require('./app');
 
-//Server starts, port 3000
-app.listen(3000, async () => {
-    await sequelize.authenticate()
-    .then(() => {
-      console.log('Connection has been established successfully.');
+//Server starts (change value of const port to desired port)
+const port = 3000;
+app.listen(port, async () => {
+  await sequelize.authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
 
-      // Capital model associations
-      Client.hasMany(Capital, { foreignKey: 'capital_client' });
-        // Capital.belongsTo(Client);
-      Client.hasMany(NewCapital, { foreignKey: 'newcapital_client' });
-        // NewCapital.belongsTo(Client);
-        Progress.hasMany(Capital, { foreignKey: 'capital_progress' });
-          // Capital.belongsTo(Progress);
+    // Capital model associations
+    Client.hasMany(Capital, { foreignKey: 'capital_client' });
+      // Capital.belongsTo(Client);
+    Client.hasMany(NewCapital, { foreignKey: 'newcapital_client' });
+      // NewCapital.belongsTo(Client);
+    Progress.hasMany(Capital, { foreignKey: 'capital_progress' });
+      // Capital.belongsTo(Progress);
 
-      // Pair model associations
-        Token.hasMany(Pair, { foreignKey: 'tokenA' });
-        // Pair.belongsTo(Token);
-        Token.hasMany(Pair, { foreignKey: 'tokenB' });
-        // Pair.belongsTo(Token);
-        Exchange.hasMany(Pair, { foreignKey: 'pair_exchange' });
-          // Pair.belongsTo(Token);
+    // Pair model associations
+    Token.hasMany(Pair, { foreignKey: 'tokenA' });
+      // Pair.belongsTo(Token);
+    Token.hasMany(Pair, { foreignKey: 'tokenB' });
+      // Pair.belongsTo(Token);
+    Exchange.hasMany(Pair, { foreignKey: 'pair_exchange' });
+      // Pair.belongsTo(Token);
 
-      // Pool model associations
-        Pair.hasMany(Pool, { foreignKey: 'pool_pair' });
-          // Pool.belongsTo(Pair);
-      
+    // Pool model associations
+    Pair.hasMany(Pool, { foreignKey: 'pool_pair' });
+      // Pool.belongsTo(Pair);
+    
 
-      // Sync tables
-      Client.sync();
-      Token.sync();
-      Exchange.sync();
-      Capital.sync();
-      NewCapital.sync();
-      Pair.sync();
-      Progress.sync();
-      Pool.sync();
+    // Sync tables
+    Client.sync();
+    Token.sync();
+    Exchange.sync();
+    Capital.sync();
+    NewCapital.sync();
+    Pair.sync();
+    Progress.sync();
+    Pool.sync();
 
-    })
-    .catch((err) => {
-      console.error('Unable to connect to the database:', error);
-    });
-  console.log("Server started (http://localhost:3000/) !");
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database:', error);
+  });
+  console.log("Server started (http://localhost:+" + port + "/) !");
 });

@@ -8,7 +8,7 @@ const clientController = require('../controllers/client.controller');
 api.get("/getClients", clientController.getClients);
 api.get("/getClient/:id", clientController.getClient);
 api.get("/getClientsCapitals", clientController.getClientsCapitals);
-api.get("/clientMonthlyData", clientController.clientMonthlyData);
+api.get("/getClientMonthlyData", clientController.getClientMonthlyData);
 
 // POST
 api.post("/addClient", clientController.addClient);

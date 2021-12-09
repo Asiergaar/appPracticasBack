@@ -3,6 +3,7 @@
 const DB = require('../services/db.service');
 const Progress = require('../models/progress.model');
 const Pool = require('../models/pool.model');
+const Client = require('../models/client.model');
 const Capital = require('../models/capital.model');
 const NewCapital = require('../models/newcapital.model');
 
@@ -14,8 +15,8 @@ async function addProgress (req, res) {
         const date = new Date();
         const result1 = await DB.query("SELECT date(p1.pool_date) as date, SUM(p1.invested_quantity) as total FROM Pools p1 GROUP BY date ORDER BY date DESC;");
         const total1 = result1[0].total;
-        const total2 = result1[1].total;
-        if(total2 == null){
+        let total2 = result1[1].total;
+        if(total2 === null){
             total2 = total1;
         }
         // Calculate the parameters
@@ -27,7 +28,7 @@ async function addProgress (req, res) {
         
         // Create or Update Progress on DB
         let progress;
-        if(oldprogress.length == 0) {
+        if(oldprogress.length === 0) {
             progress = await DB.createProgress(date, benefit);
         } else {
             await DB.updateProgress(date, benefit, oldprogress[0].progress_id);
@@ -70,23 +71,23 @@ async function checkProgress (req, res) {
             let progressIdList = [];
 
             // Create missing progress
-            let datenew = new Date(date1);
-            datenew.setDate(date1.getDate() + i);
-            let progressId = await DB.createProgress(datenew, 0);
+            let dateNew = new Date(date1);
+            dateNew.setDate(date1.getDate() + i);
+            let progressId = await DB.createProgress(dateNew, 0);
             progressIdList.push(progressId.progress_id);
 
             // Create missing pools of the progress
-            let dateminus = new Date(datenew);
-            dateminus.setDate(datenew.getDate() - 1);
-            const pools = await DB.query("SELECT p1.invested_quantity as invested, p1.pool_pair as pair FROM Pools p1 WHERE date(p1.pool_date) = '" + dateminus.toISOString().split('T')[0] + "';");
+            let dateMinus = new Date(dateNew);
+            dateMinus.setDate(dateNew.getDate() - 1);
+            const pools = await DB.query("SELECT p1.invested_quantity as invested, p1.pool_pair as pair FROM Pools p1 WHERE date(p1.pool_date) = '" + dateMinus.toISOString().split('T')[0] + "';");
             for (let p in pools) {
-                const poo = await DB.createPool(datenew, pools[p].invested, pools[p].pair);
+                const poo = await DB.createPool(dateNew, pools[p].invested, pools[p].pair);
             }
             // Create missing capitals
-            const capitals = await DB.query("SELECT c1.capital_client, c1.capital_quantity, c1.capital_progress FROM Capitals c1 WHERE date(c1.capital_date) = '" + dateminus.toISOString().split('T')[0] + "';");
+            const capitals = await DB.query("SELECT c1.capital_client, c1.capital_quantity, c1.capital_progress FROM Capitals c1 WHERE date(c1.capital_date) = '" + dateMinus.toISOString().split('T')[0] + "';");
             for (let p in capitals) {
                 let cont = 0;
-                await DB.createCapital(capitals[p].capital_client, datenew, capitals[p].capital_quantity, progressIdList[cont]);
+                await DB.createCapital(capitals[p].capital_client, dateNew, capitals[p].capital_quantity, progressIdList[cont]);
                 cont++;
             }
 
@@ -109,8 +110,16 @@ async function checkProgress (req, res) {
 // Function to data testing: substract 1 day from database dates (pools, progresses, capitals and newcapitals)
 async function minusDate (req, res) {
     try {
-        const pools = await Pool.findAll();
+        const clients = await Client.findAll();
         for (let p in pools) {
+            let date = new Date(clients[p].entry_date);
+            date.setDate(date.getDate() - 1)
+            clients[p].update({
+                entry_date: date
+            });
+        }
+        const pools = await Pool.findAll();
+        for (let p in clients) {
             let date = new Date(pools[p].pool_date);
             date.setDate(date.getDate() - 1)
             pools[p].update({

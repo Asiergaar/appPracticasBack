@@ -80,7 +80,7 @@ async function getPoolStatus (req, res) {
         const total = await DB.query("SELECT p1.pool_date FROM Pools p1 WHERE date(p1.pool_date) = (SELECT date(min(p2.pool_date)) FROM Pools p2);");
     
         let status = '';
-        if(pools == 0 || pools == null || pools == undefined){
+        if(pools === 0 || pools === null || pools === undefined){
             status = 'empty';
         } else if (pools.length != total.length) {
             status = 'half';
@@ -120,11 +120,11 @@ async function getPool (req, res) {
 async function addPools (req, res) {
     try {
         let pool;
-        var pool_date = Date();
-        var pools = req.body;
+        let poolDate = Date();
+        let pools = req.body;
         for (let p in pools) {
             // Creates the pool with the invested quantity
-            pool = await DB.createPool(pool_date, pools[p], parseInt(p));
+            pool = await DB.createPool(poolDate, pools[p], parseInt(p));
         }
         return res.status(200).send({
             message: 'success',
@@ -147,7 +147,7 @@ async function addPool (req, res) {
         let pool;
         
         // If first pool, creates first progress
-        if (progresses.length == 0) {
+        if (progresses.length === 0) {
             await DB.createProgress(pool_date, 0); 
         }
         // if previous progress existing, adds pools of those days at 0 
@@ -157,7 +157,7 @@ async function addPool (req, res) {
             }
     
             // if today's pools done
-            if (pool_date.toISOString().split('T')[0] == last_date.toISOString().split('T')[0]) {
+            if (pool_date.toISOString().split('T')[0] === last_date.toISOString().split('T')[0]) {
                 // Updates the last pool with the invested quantity
                 await DB.updatePoolQuantity(req.body.invested_quantity, pool.pool_id);
     
@@ -168,7 +168,7 @@ async function addPool (req, res) {
                 const total1 = result1[0].total;
                 const total2 = result1[1].total;
 
-                if(total2 == null){ total2 = total1; }
+                if(total2 === null){ total2 = total1; }
                 const benefit = ( ( total1 - total2 ) / total1) * 100;
                 const oldbenefit = ( ( (total1 - req.body.invested_quantity) - total2 ) / total1) * 100;
 
@@ -177,9 +177,9 @@ async function addPool (req, res) {
                 // update capitals
                 const capitals = await DB.query("SELECT * FROM Capitals WHERE date(capital_date) = date('" + pool_date.toISOString().split('T')[0] + "');");
                 for (let c in capitals) {
-                    let newquantity = capitals[c].capital_quantity * ( (oldbenefit / 100) -1 );
-                    newquantity = newquantity * -( (benefit / 100) +1 );
-                    await DB.updateCapitalQuantity(newquantity, capitals[c].capital_id);
+                    let newQuantity = capitals[c].capital_quantity * ( (oldbenefit / 100) -1 );
+                    newQuantity = newQuantity * -( (benefit / 100) +1 );
+                    await DB.updateCapitalQuantity(newQuantity, capitals[c].capital_id);
                 }
             } else {
                 // Creates the pool with the invested quantity
@@ -232,7 +232,7 @@ async function getPoolsByDay (req, res) {
     
         let increment = [];
         for(let i = 0; i < pools.length; i++){
-            if (i == 0){ 
+            if (i === 0){ 
                 pools[i].Increment = 0;
                 pools[i].RealIncrement = 0;
                 pools[i].Benefit = (pools[i].Increment / pools[i].TOTAL)*100; 

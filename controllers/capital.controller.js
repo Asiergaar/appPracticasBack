@@ -41,11 +41,11 @@ async function addCapitals (req, res) {
     try {
         // get the progress date and date -1 day
         const fecha = new Date(req.body.progress_date);
-        let dateminus = new Date(req.body.progress_date);
-        dateminus.setDate(dateminus.getDate() - 1);
+        let dateMinus = new Date(req.body.progress_date);
+        dateMinus.setDate(dateMinus.getDate() - 1);
     
         // gets yesterday capitals
-        const capitalList = await DB.query("SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = date('" + dateminus.toISOString().split('T')[0] + "');");
+        const capitalList = await DB.query("SELECT c1.capital_quantity, c1.capital_client, date(c1.capital_date) FROM Capitals c1 WHERE date(c1.capital_date) = date('" + dateMinus.toISOString().split('T')[0] + "');");
     
         // get new clients of the date
         const newclients = await DB.query("SELECT client_id FROM Clients WHERE date(entry_date) = date('" + fecha.toISOString().split('T')[0] + "');");
@@ -53,11 +53,11 @@ async function addCapitals (req, res) {
         // crete new capital for all the clients except the new ones
         for(let n in capitalList) {
             if(!newclients.includes(capitalList[n].capital_client)) {
-                let newcap = await DB.query("SELECT newcapital_quantity FROM Newcapitals WHERE newcapital_client = " + capitalList[n].capital_client + " AND date(newcapital_date) = date('" + fecha.toISOString().split('T')[0] + "');");
+                let newCap = await DB.query("SELECT newcapital_quantity FROM Newcapitals WHERE newcapital_client = " + capitalList[n].capital_client + " AND date(newcapital_date) = date('" + fecha.toISOString().split('T')[0] + "');");
                 if(newcap[0]){
-                    newcap = newcap[0].newcapital_quantity;
+                    newCap = newcap[0].newcapital_quantity;
                 } else {
-                    newcap = 0;
+                    newCap = 0;
                 }
                 const capital_quantity = (capitalList[n].capital_quantity * ( (req.body.progress_percentage / 100) + 1)) + newcap;
                 const capital = await DB.createCapital(capitalList[n].capital_client, fecha, capital_quantity, req.body.progress_id);
@@ -115,9 +115,9 @@ async function newCapital (req, res) {
             const capitals = await DB.query("SELECT date(cap.capital_date) as Date, cap.capital_quantity, cap.capital_client FROM Capitals cap WHERE date(cap.capital_date) = date('" + fecha.toISOString().split('T')[0] + "', '-1 day');");
     
             for(let p in capitals){
-                let newcapital = capitals[p].capital_quantity * ( (benefit / 100) + 1);
-                if (capitals[p].capital_client == client) { newcapital = newcapital + quantity; }
-                await DB.query("UPDATE Capitals SET capital_quantity = " + newcapital + " WHERE date(capital_date) = date('" + fecha.toISOString().split('T')[0] + "') AND capital_client = " + capitals[p].capital_client + ";");
+                let newCapital = capitals[p].capital_quantity * ( (benefit / 100) + 1);
+                if (capitals[p].capital_client === client) { newCapital = newCapital + quantity; }
+                await DB.query("UPDATE Capitals SET capital_quantity = " + newCapital + " WHERE date(capital_date) = date('" + fecha.toISOString().split('T')[0] + "') AND capital_client = " + capitals[p].capital_client + ";");
             }
         }
     

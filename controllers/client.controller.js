@@ -52,24 +52,24 @@ async function getClient (req, res) {
 async function addClient (req, res) {
     try {
         // Create de client on DB
-        var entry_date = new Date();
-        const client = await DB.createClient(req.body.client_name, req.body.client_surname, req.body.email, entry_date, req.body.start_capital);
+        let entryDate = new Date();
+        const client = await DB.createClient(req.body.client_name, req.body.client_surname, req.body.email, entryDate, req.body.start_capital);
     
         // Create Progress if doesn't exist that day's progress
-        const pooldate = await DB.query("SELECT date(p1.progress_date) as date FROM Progresses p1 WHERE date = '" + entry_date.toISOString().split('T')[0] + "';");
+        const pooldate = await DB.query("SELECT date(p1.progress_date) as date FROM Progresses p1 WHERE date = '" + entryDate.toISOString().split('T')[0] + "';");
         let id;
-        if (pooldate.length == 0){
+        if (pooldate.length === 0){
             // Add first progress and capital to database and get the progress id
-            id = await DB.createProgress(entry_date, 0);
+            id = await DB.createProgress(entryDate, 0);
             id = id.progress_id;
         } else {
             // Get the progress id
-            id = await DB.query("SELECT p1.progress_id FROM Progresses p1 WHERE date(p1.progress_date) = '" + entry_date.toISOString().split('T')[0] + "';");
+            id = await DB.query("SELECT p1.progress_id FROM Progresses p1 WHERE date(p1.progress_date) = '" + entryDate.toISOString().split('T')[0] + "';");
             id = id[0].progress_id;
         }
         
         // Create the client's capital for that day
-        const capital = await DB.createCapital(client.client_id, entry_date, client.start_capital, id);
+        const capital = await DB.createCapital(client.client_id, entryDate, client.start_capital, id);
         
         return res.status(200).send({
             message: 'success',
@@ -106,7 +106,7 @@ async function getClientsCapitals (req, res) {
         const clientsList = await Client.findAll({attributes: ['client_id']});
 
         // If no clients on database, return empty array
-        if (clientsList.length == 0) {
+        if (clientsList.length === 0) {
             return res.status(200).send({
                 message: 'no data',
                 data: []
@@ -135,10 +135,10 @@ async function getClientsCapitals (req, res) {
 }
 
 // GET clients monthly data
-async function clientMonthlyData (req, res) {
+async function getClientMonthlyData (req, res) {
     try{
         let result = [];
-        let resultcsv = [];
+        let resultCsv = [];
         const clients = await Client.findAll();
         for (let cli in clients){
             const id = clients[cli].client_id;
@@ -157,7 +157,7 @@ async function clientMonthlyData (req, res) {
             // convert json to csv
             try {
                 let csv = await Utils.jsonToCsv(capitals);
-                resultcsv.push({id: id, data: csv});
+                resultCsv.push({id: id, data: csv});
             } catch (err) {
                 console.log(err);
             }
@@ -166,7 +166,7 @@ async function clientMonthlyData (req, res) {
         return res.status(200).send({
             message: 'success',
             data: result,
-            csv: resultcsv
+            csv: resultCsv
         });
 
     } catch (err) {
@@ -183,5 +183,5 @@ module.exports = {
     getClient,
     editClient,
     getClientsCapitals,
-    clientMonthlyData
+    getClientMonthlyData
 }
