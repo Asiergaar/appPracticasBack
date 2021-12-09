@@ -1,27 +1,33 @@
 # API:
 
 Para arrancar la api en local en el puerto 3000: 
-  npm run start
+```
+npm run start
+```
 
 Si se van a hacer modificaciones, se puede arrancar con nodemon:
-  npm run start-dev
+```
+npm run start-dev
+```
 
-Para arrancar en otro puerto, hay que modificar en el archivo index.js el valor de la constante port al número de puerto que se quiera.
+Para arrancar en otro puerto, hay que modificar en el archivo _index.js_ el valor de la constante port al número de puerto que se quiera.
 
 
 # FRONT:
 
 Para el front en local en el puerto 4200: 
-  ng serve
+```
+ng serve
+```
 
-Para arrancar en otro puerto, hay que modificar en el archivo angular.json el valor de “port” (dentro de projects>front>architect>serve>options>port) al número de puerto que se quiera.
+Para arrancar en otro puerto, hay que modificar en el archivo _angular.json_ el valor de “port” (dentro de _projects>front>architect>serve>options>port_) al número de puerto que se quiera.
 
-Si se cambia el puerto en la api, hay que ajustar en el front los dos archivos de entorno con el número de puerto nuevo, environment.ts y environment.prod.ts que están en la carpeta src>environments.
+Si se cambia el puerto en la api, hay que ajustar en el front los dos archivos de entorno con el número de puerto nuevo, _environment.ts_ y _environment.prod.ts_ que están en la carpeta _src>environments_.
 
 
 # Una vez arrancada la aplicación:
 
-En la home, hay un botón "app info" con unas pequeñas instrucciones. Para que funcione bien hay que:
+En la home, hay un botón _app info_ con unas pequeñas instrucciones. Para que funcione bien hay que:
 
 1. Crear Tokens: no se podrá añadir un nombre de token o un ticker ya existente en la base de datos.
 
@@ -35,5 +41,5 @@ En la home, hay un botón "app info" con unas pequeñas instrucciones. Para que 
 
 4. Actualizar los pools con las cantidades diarias. Esta operación solo se puede hacer una vez por día*.
 
-  * Para hacer pruebas y poder meter más datos, se pueden echar todas las fechas un día para atrás en: http://localhost:3000/progress/minusDate
+  * _Para hacer pruebas y poder meter más datos, se pueden echar todas las fechas un día para atrás en:_ http://localhost:3000/progress/minusDate
 
