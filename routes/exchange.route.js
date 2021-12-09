@@ -10,6 +10,8 @@ api.get("/getExchange/:id", exchangeController.getExchange);
 
 //POST
 api.post("/addExchange", exchangeController.addExchange);
-api.post("/editExchange/:id", exchangeController.editExchange);
+
+// PUT
+api.put("/editExchange/:id", exchangeController.editExchange);
 
 module.exports = api;

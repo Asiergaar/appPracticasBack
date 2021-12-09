@@ -11,6 +11,8 @@ api.get("/getPair/:id", pairController.getPair);
 
 //POST
 api.post("/addPair", pairController.addPair);
-api.post("/editPair/:id", pairController.editPair);
+
+// PUT
+api.put("/editPair/:id", pairController.editPair);
 
 module.exports = api;

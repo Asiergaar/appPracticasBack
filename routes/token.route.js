@@ -11,6 +11,8 @@ api.get("/getToken/:id", tokenController.getToken);
 
 //POST
 api.post("/addToken", tokenController.addToken);
-api.post("/editToken/:id", tokenController.editToken);
+
+// PUT
+api.put("/editToken/:id", tokenController.editToken);
 
 module.exports = api;

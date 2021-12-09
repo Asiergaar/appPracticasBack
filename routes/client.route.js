@@ -12,6 +12,8 @@ api.get("/getClientMonthlyData", clientController.getClientMonthlyData);
 
 // POST
 api.post("/addClient", clientController.addClient);
-api.post("/editClient/:id", clientController.editClient);
+
+// PUT
+api.put("/editClient/:id", clientController.editClient);
 
 module.exports = api;
