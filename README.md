@@ -1,4 +1,6 @@
-# API:
+# Aplicación de Farming
+
+## Back-end API:
 
 Para arrancar la api en local en el puerto 3000: 
 ```
@@ -13,7 +15,7 @@ npm run start-dev
 Para arrancar en otro puerto, hay que modificar en el archivo _index.js_ el valor de la constante port al número de puerto que se quiera.
 
 
-# FRONT:
+## Front-end:
 
 Para el front en local en el puerto 4200: 
 ```
@@ -25,7 +27,7 @@ Para arrancar en otro puerto, hay que modificar en el archivo _angular.json_ el 
 Si se cambia el puerto en la api, hay que ajustar en el front los dos archivos de entorno con el número de puerto nuevo, _environment.ts_ y _environment.prod.ts_ que están en la carpeta _src>environments_.
 
 
-# Una vez arrancada la aplicación:
+## Una vez arrancada la aplicación:
 
 En la home, hay un botón **app info** con unas pequeñas instrucciones. Para que funcione bien hay que:
 
