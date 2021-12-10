@@ -1,5 +1,5 @@
 ### Language
-[![es](https://img.shields.io/badge/lang-es-yellow.svg)](./README.es.md)
+[![es](https://img.shields.io/badge/lang-es-red.svg)](./README.es.md)
 
 # Farming Application
 
