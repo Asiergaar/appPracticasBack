@@ -13,8 +13,7 @@ async function getPools (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -29,8 +28,7 @@ async function getPoolsName (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -51,8 +49,7 @@ async function getPoolsData (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -67,8 +64,7 @@ async function getPoolsDistinct (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -94,8 +90,7 @@ async function getPoolStatus (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -110,8 +105,7 @@ async function getPool (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -132,8 +126,7 @@ async function addPools (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -192,8 +185,7 @@ async function addPool (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -208,8 +200,7 @@ async function editPool (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -250,8 +241,7 @@ async function getPoolsByDay (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }

@@ -13,8 +13,7 @@ async function getPairs (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -29,8 +28,7 @@ async function getPairsName (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -45,8 +43,7 @@ async function getPair (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -61,8 +58,7 @@ async function addPair (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -77,8 +73,7 @@ async function editPair (req, res) {
         })
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }

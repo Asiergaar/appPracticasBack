@@ -45,8 +45,7 @@ async function addProgress (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -101,8 +100,7 @@ async function checkProgress (req, res) {
     });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -155,8 +153,7 @@ async function minusDate (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }

@@ -13,8 +13,7 @@ async function getCapitals (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -30,8 +29,7 @@ async function getCapital (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -73,8 +71,7 @@ async function addCapitals (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -85,8 +82,7 @@ async function setCapital (req, res) {
         await DB.query("UPDATE Capitals SET capital_quantity = " + req.body.capital_quantity + " WHERE capital_client = " + req.body.capital_client + ";");
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -128,8 +124,7 @@ async function newCapital (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
@@ -144,8 +139,7 @@ async function getMonthTotals (req, res) {
         });
     } catch (err) {
         return res.status(500).send({
-            message: 'error',
-            data: err.message
+            message: 'Server error'
         });
     }
 }
