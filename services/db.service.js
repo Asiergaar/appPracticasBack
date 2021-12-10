@@ -81,10 +81,13 @@ async function createPool(date, quantity, pair) {
 }
 
 async function createProgress(date, percentage) {
-    return await Progress.create({
-        progress_date: date,
-        progress_percentage: percentage
-    });
+    const progress = await this.query("SELECT * FROM Progresses WHERE date(progress_date) = date('" + date.toISOString().split('T')[0] + "');");
+    if (progress.length === 0) {
+        return await Progress.create({
+            progress_date: date,
+            progress_percentage: percentage
+        });
+    }
 }
 
 async function createToken(name, ticker, imgUrl) {
