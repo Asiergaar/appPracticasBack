@@ -1,60 +1,60 @@
-# Aplicación de Farming
+# Farming Application
 
 ## Back-end API:
 
-Para arrancar la api en local en el puerto 3000: 
+To run the api locally on port 3000: 
 ```
 npm run start
 ```
 
-Si se van a hacer modificaciones, se puede arrancar con nodemon:
+For developing, to automatically restart on save, can be run with nodemon:
 ```
 npm run start-dev
 ```
 
-Para arrancar en otro puerto, hay que modificar en el archivo _index.js_ el valor de la constante port al número de puerto que se quiera.
+To run on another port, modify the value of the **port** constant on _index.js_ file to the desired port number.
 
-### Base de datos
-La base de datos se genera en el archivo **farming.db** en la carpeta _/data_.
+### Database
+Database is generated on **farming.db** file, in _/data_ folder.
 
-Para visualizarla recomiendo utilizar [SQLiteStudio](https://sqlitestudio.pl/).
+To view it I recommend using [SQLiteStudio](https://sqlitestudio.pl/).
 
 
 ## Front-end:
 
-Para el front en local en el puerto 4200: 
+To build and serve, in port 4200: 
 ```
 ng serve
 ```
 
-Para arrancar en otro puerto, hay que modificar en el archivo _angular.json_ el valor de “port” (dentro de _projects>front>architect>serve>options>port_) al número de puerto que se quiera.
+To run on another port, modify in _angular.json_ file the value of “port” (inside _projects:front:architect:serve:options:port_) to desired port number.
 
-Si se cambia el puerto en la api, hay que ajustar en el front los dos archivos de entorno con el número de puerto nuevo, _environment.ts_ y _environment.prod.ts_ que están en la carpeta _src>environments_.
-
-
-## Una vez arrancada la aplicación:
-
-En la home, hay un botón **app info** con unas pequeñas instrucciones. Para que funcione bien hay que:
-
-1. **Crear Tokens**: no se podrá añadir un nombre de token o un ticker ya existente en la base de datos.
-
-   **Crear Exchanges**: no se podrá añadir un nombre de exchange ya existente en la base de datos
-
-   **Crear Clientes**: no se podrá añadir un cliente que coincida en nombre, apellidos y email con otro cliente existente en la base de datos.
-
-2. Con datos añadidos **crear los Pares**, se cargan en la lista los tokens y exhanges creados.
-
-3. **Añadir los pares creados al pool**, una vez añadido un par, dejará de aparecer en la lista de opciones.
-
-4. **Actualizar los pools** con las cantidades diarias. Esta operación solo se puede hacer una vez por día*.
-
-  * _Para hacer pruebas y poder meter más datos, se pueden echar todas las fechas un día para atrás en:_ http://localhost:3000/progress/minusDate
+If the port of the api is changed, modify on the front-end the environment files with the new port number, _environment.ts_ & _environment.prod.ts_ which are in the folder _src>environments_.
 
 
-## Herramientas utilizadas
+## With the app running:
+
+On the home page, there is an **app info** button with brief instructions. For a correct workflow you have to:
+
+1. **Create Tokens**: an existing token name or ticker can't be added to the database.
+
+   **Create Exchanges**: an existing exchange name cannot be added to the database.
+
+   **Create Clientes**: a client that matches in name, surname and email with another existing client in the database can't be added.
+
+2. With added data **create the Pairs**, created tokens and exhanges will be loaded into the list.
+
+3. **Add the created pairs to the pool**, once a pair has been added, it will no longer appear in the option list.
+
+4. **Update the pools** with the daily amounts. This operation can only be done once a day*.
+
+  * _To do tests and to be able to insert more data, you can change all the dates back one day in:_ http://localhost:3000/progress/minusDate
+
+
+## Used tools
 
 ### Back-end
-* [Node.Js](https://nodejs.org/es/download/)
+* [Node.Js](https://nodejs.org/)
 * [Sequelize](https://sequelize.org/)
 * [SQLiteStudio](https://sqlitestudio.pl/)
 
