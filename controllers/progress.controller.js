@@ -109,7 +109,7 @@ async function checkProgress (req, res) {
 async function minusDate (req, res) {
     try {
         const clients = await Client.findAll();
-        for (let p in pools) {
+        for (let p in clients) {
             let date = new Date(clients[p].entry_date);
             date.setDate(date.getDate() - 1)
             clients[p].update({
@@ -117,7 +117,7 @@ async function minusDate (req, res) {
             });
         }
         const pools = await Pool.findAll();
-        for (let p in clients) {
+        for (let p in pools) {
             let date = new Date(pools[p].pool_date);
             date.setDate(date.getDate() - 1)
             pools[p].update({
