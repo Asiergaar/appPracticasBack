@@ -178,6 +178,9 @@ async function addPool (req, res) {
                 // Creates the pool with the invested quantity
                 const pool = await DB.createPool(pool_date, req.body.invested_quantity, req.body.pool_pair);
             }
+        } else {
+            // Creates the pool with the invested quantity
+            const pool = await DB.createPool(pool_date, req.body.invested_quantity, req.body.pool_pair);
         }
         return res.status(200).send({
             message: 'success',

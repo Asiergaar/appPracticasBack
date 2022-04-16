@@ -105,13 +105,15 @@ async function checkProgress (req, res) {
     }
 }
 
-// Function to data testing: substract 1 day from database dates (pools, progresses, capitals and newcapitals)
+// Function to data testing: sum X day from database dates (clients, pools, progresses, capitals and newcapitals)
 async function minusDate (req, res) {
+    const quantity = 9;
+
     try {
         const clients = await Client.findAll();
         for (let p in clients) {
             let date = new Date(clients[p].entry_date);
-            date.setDate(date.getDate() - 1)
+            date.setDate(date.getDate() + quantity);
             clients[p].update({
                 entry_date: date
             });
@@ -119,7 +121,7 @@ async function minusDate (req, res) {
         const pools = await Pool.findAll();
         for (let p in pools) {
             let date = new Date(pools[p].pool_date);
-            date.setDate(date.getDate() - 1)
+            date.setDate(date.getDate() + quantity);
             pools[p].update({
                 pool_date: date
             });
@@ -127,7 +129,7 @@ async function minusDate (req, res) {
         const progress = await Progress.findAll();
         for (let p in progress) {
             let date = new Date(progress[p].progress_date);
-            date.setDate(date.getDate() - 1)
+            date.setDate(date.getDate() + quantity);
             progress[p].update({
                 progress_date: date
             });
@@ -135,7 +137,7 @@ async function minusDate (req, res) {
         const capitals = await Capital.findAll();
         for (let p in capitals) {
             let date = new Date(capitals[p].capital_date);
-            date.setDate(date.getDate() - 1)
+            date.setDate(date.getDate() + quantity);
             capitals[p].update({
                 capital_date: date
             });
@@ -143,7 +145,7 @@ async function minusDate (req, res) {
         const newcapitals = await NewCapital.findAll();
         for (let p in newcapitals) {
             let date = new Date(newcapitals[p].newcapital_date);
-            date.setDate(date.getDate() - 1)
+            date.setDate(date.getDate() + quantity);
             newcapitals[p].update({
                 newcapital_date: date
             }); 
